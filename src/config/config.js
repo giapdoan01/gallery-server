@@ -1,10 +1,15 @@
+// config/config.js
 require('dotenv').config();
 
 module.exports = {
     // Server
     env: process.env.NODE_ENV || 'development',
+    
+    // ✅ Render sẽ tự động set PORT, không dùng 2567
     port: parseInt(process.env.PORT) || 2567,
-    host: process.env.HOST || 'localhost',
+    
+    // ✅ Đổi từ 'localhost' → '0.0.0.0' để Render có thể access
+    host: process.env.HOST || '0.0.0.0',
     
     // CORS
     corsOrigin: process.env.CORS_ORIGIN || '*',

@@ -1,0 +1,19 @@
+# render.yaml
+services:
+  - type: web
+    name: gallery-server
+    env: node
+    region: singapore  # Gần Việt Nam nhất
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MAX_PLAYERS
+        value: 50
+      - key: CORS_ORIGIN
+        value: '*'
+      - key: ROOM_NAME
+        value: gallery
