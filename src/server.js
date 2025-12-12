@@ -38,7 +38,7 @@ async function startServer() {
         app.use('/monitor', monitor());
         LoggerService.success('Monitor enabled at /monitor');
 
-        // ✅ 7. Health check endpoint (QUAN TRỌNG cho Render)
+        // 7. Health check endpoint (QUAN TRỌNG cho Render)
         app.get('/health', (req, res) => {
             res.json({
                 status: 'ok',
@@ -50,13 +50,14 @@ async function startServer() {
             });
         });
 
-        // ✅ 8. Root endpoint
+        // 8. Root endpoint
         app.get('/', (req, res) => {
             res.json({
                 message: '🎨 Gallery Multiplayer Server',
                 version: '1.0.0',
                 status: 'running',
                 endpoints: {
+                    health: '/health',
                     api: '/api',
                     monitor: '/monitor',
                     websocket: req.protocol === 'https' 
@@ -66,8 +67,11 @@ async function startServer() {
             });
         });
 
-        // ✅ 9. Start server - Listen on 0.0.0.0
-        httpServer.listen(config.port, '0.0.0.0', () => {
+        // ✅ 9. QUAN TRỌNG: Listen trên port
+        const port = config.port;
+        const host = '0.0.0.0';
+        
+        httpServer.listen(port, host, () => {
             const isProduction = config.env === 'production';
             
             console.log(`
@@ -76,15 +80,16 @@ async function startServer() {
 ║   🎨 GALLERY MULTIPLAYER SERVER                      ║
 ║                                                       ║
 ║   Environment: ${config.env.padEnd(36)}║
-║   Port: ${config.port.toString().padEnd(42)}║
+║   Port: ${port.toString().padEnd(42)}║
+║   Host: ${host.padEnd(42)}║
 ║                                                       ║`);
 
             if (isProduction) {
                 console.log(`║   🌐 Production Mode                                  ║`);
             } else {
-                console.log(`║   🌐 API: http://${config.host}:${config.port}/api${' '.repeat(21)}║
-║   📊 Monitor: http://${config.host}:${config.port}/monitor${' '.repeat(15)}║
-║   🎮 WebSocket: ws://${config.host}:${config.port}${' '.repeat(19)}║`);
+                console.log(`║   🌐 API: http://localhost:${port}/api${' '.repeat(24)}║
+║   📊 Monitor: http://localhost:${port}/monitor${' '.repeat(18)}║
+║   🎮 WebSocket: ws://localhost:${port}${' '.repeat(22)}║`);
             }
 
             console.log(`║                                                       ║
@@ -93,30 +98,51 @@ async function startServer() {
 ╚═══════════════════════════════════════════════════════╝
             `);
 
-            LoggerService.success('Server is ready!');
+            LoggerService.success(`✅ Server is listening on ${host}:${port}`);
+            LoggerService.success('✅ Server is ready!');
         });
 
-        // ✅ 10. Graceful shutdown
+        // 10. Error handling for server
+        httpServer.on('error', (error) => {
+            if (error.code === 'EADDRINUSE') {
+                LoggerService.error(`❌ Port ${port} is already in use`);
+            } else {
+                LoggerService.error('❌ Server error:', error.message);
+            }
+            process.exit(1);
+        });
+
+        // 11. Graceful shutdown
         process.on('SIGTERM', async () => {
-            LoggerService.warning('SIGTERM received, shutting down...');
+            LoggerService.warning('⚠️  SIGTERM received, shutting down gracefully...');
             await gameServer.gracefullyShutdown();
             httpServer.close(() => {
-                LoggerService.success('Server closed');
+                LoggerService.success('✅ Server closed');
                 process.exit(0);
             });
         });
 
         process.on('SIGINT', async () => {
-            LoggerService.warning('SIGINT received, shutting down...');
+            LoggerService.warning('⚠️  SIGINT received, shutting down gracefully...');
             await gameServer.gracefullyShutdown();
             httpServer.close(() => {
-                LoggerService.success('Server closed');
+                LoggerService.success('✅ Server closed');
                 process.exit(0);
             });
         });
 
+        // 12. Unhandled errors
+        process.on('unhandledRejection', (reason, promise) => {
+            LoggerService.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+        });
+
+        process.on('uncaughtException', (error) => {
+            LoggerService.error('❌ Uncaught Exception:', error);
+            process.exit(1);
+        });
+
     } catch (error) {
-        LoggerService.error('Failed to start server:', error.message);
+        LoggerService.error('❌ Failed to start server:', error.message);
         console.error(error);
         process.exit(1);
     }
