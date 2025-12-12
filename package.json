@@ -1,0 +1,34 @@
+{
+  "name": "gallery-server",
+  "version": "1.0.0",
+  "description": "Gallery multiplayer server with MVC architecture",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "colyseus",
+    "express",
+    "mvc",
+    "multiplayer",
+    "gallery"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@colyseus/monitor": "^0.16.7",
+    "@colyseus/schema": "^3.0.70",
+    "colyseus": "^0.16.5",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
