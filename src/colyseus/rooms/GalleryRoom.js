@@ -5,7 +5,6 @@ const LoggerService = require('../../services/logger.service');
 const SanitizerUtil = require('../../utils/sanitizer.util');
 const config = require('../../config/config');
 
-
 class GalleryRoom extends Room {
     
     onCreate(options) {
@@ -38,104 +37,50 @@ class GalleryRoom extends Room {
         this.onMessage("chat", (client, data) => {
             MessageHandler.handleChat(this, client, data);
         });
-        
-        this.onMessage("emote", (client, data) => {
-            MessageHandler.handleEmote(this, client, data);
-        });
-        
-        this.onMessage("viewArtwork", (client, data) => {
-            MessageHandler.handleViewArtwork(this, client, data);
-        });
-        
-        this.onMessage("stopViewing", (client, data) => {
-            MessageHandler.handleStopViewing(this, client, data);
-        });
     }
 
     onJoin(client, options) {
-        console.log('📦 Options received:', JSON.stringify(options));
+        // Sanitize input
+        const username = SanitizerUtil.sanitizeUsername(options.username || "Guest");
+        const avatarURL = SanitizerUtil.sanitizeUrl(options.avatarURL || "https://models.readyplayer.me/64bfa15f0e72c63d7c3934a6.glb"); // ✅ LẤY AVATAR URL
         
-        LoggerService.player('JOINING', options.username || options.name || 'Guest', `(${client.sessionId})`);
+        LoggerService.player('JOINED', client.sessionId, username);
         
         // Create player
         const player = new Player();
-        player.sessionId = client.sessionId; 
-        
-        player.username = SanitizerUtil.sanitizeName(
-            options.username || options.name || `Guest_${Math.floor(Math.random() * 10000)}`
-        );
-        
-        player.avatarIndex = options.avatarIndex || 0;
-        
-        console.log(`👤 Player created: ${player.username} (Avatar: ${player.avatarIndex})`);
-        
-        // Set spawn position
-        const spawnPos = this.getSpawnPosition();
-        player.x = spawnPos.x;
-        player.y = spawnPos.y;
-        player.z = spawnPos.z;
-        player.rotationY = Math.random() * 360;
-        
-        player.currentArtwork = "";
-        player.isViewing = false;
+        player.sessionId = client.sessionId;
+        player.username = username;
+        player.avatarURL = avatarURL; // ✅ LƯU AVATAR URL
+        player.x = Math.random() * 10 - 5;
+        player.y = 0;
+        player.z = Math.random() * 10 - 5;
+        player.rotationY = 0;
+        player.animationState = "idle";
+        player.isMoving = false;
         
         // Add to state
         this.state.players.set(client.sessionId, player);
         
-        // Send welcome message
-        client.send("welcome", {
-            message: `Chào mừng ${player.username} đến phòng tranh!`,
-            totalPlayers: this.state.players.size,
-            roomId: this.roomId
+        // Log player data
+        console.log(`✅ Player data:`, {
+            sessionId: client.sessionId,
+            username: player.username,
+            avatarURL: player.avatarURL,
+            position: { x: player.x, y: player.y, z: player.z }
         });
-        
-        // Broadcast to others
-        this.broadcast("playerJoined", {
-            sessionId: client.sessionId, 
-            username: player.username,     
-            avatarIndex: player.avatarIndex
-        }, { except: client });
-        
-        LoggerService.success(
-            `${player.username} joined! (${this.state.players.size}/${this.maxClients})`
-        );
     }
 
     onLeave(client, consented) {
         const player = this.state.players.get(client.sessionId);
         
-        if (!player) return;
-        
-        LoggerService.player('LEAVING', player.username, consented ? 'consented' : 'disconnected');
-        
-        // Calculate session duration
-        const duration = Date.now() - (player.joinedAt || Date.now());
-        const minutes = Math.floor(duration / 60000);
-        const seconds = Math.floor((duration % 60000) / 1000);
-        
-        LoggerService.info(`Session duration: ${minutes}m ${seconds}s`);
-        
-        // Remove player
-        this.state.players.delete(client.sessionId);
-        
-        // Broadcast to others
-        this.broadcast("playerLeft", {
-            sessionId: client.sessionId,  
-            username: player.username    
-        });
-        
-        LoggerService.warning(
-            `${player.username} left (${this.state.players.size}/${this.maxClients})`
-        );
+        if (player) {
+            LoggerService.player('LEFT', client.sessionId, player.username);
+            this.state.players.delete(client.sessionId);
+        }
     }
 
     onDispose() {
         LoggerService.room('DISPOSED', this.roomId);
-    }
-
-    getSpawnPosition() {
-        const positions = config.spawnPositions;
-        return positions[Math.floor(Math.random() * positions.length)];
     }
 }
 
