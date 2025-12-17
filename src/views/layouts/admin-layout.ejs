@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Admin ArtGallery' %></title>
+    <!-- Bootstrap CSS từ CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        /* CSS dự phòng nếu file CSS không tải được */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            background-color: #343a40;
+            padding-top: 20px;
+        }
+        .sidebar a {
+            color: rgba(255,255,255,.75);
+            padding: 10px 20px;
+            display: block;
+            text-decoration: none;
+            margin-bottom: 5px;
+        }
+        .sidebar a:hover {
+            color: white;
+            background-color: rgba(255,255,255,.1);
+        }
+        .sidebar a.active {
+            color: white;
+            background-color: rgba(255,255,255,.2);
+        }
+        .content {
+            padding: 20px;
+        }
+        .auth-form {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <% if (typeof user !== 'undefined') { %>
+        <%- include('../admin/partials/header') %>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-2 sidebar">
+                    <%- include('../admin/partials/sidebar') %>
+                </div>
+                <div class="col-md-10 content">
+                    <%- body %>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <%- body %>
+    <% } %>
+
+    <!-- Bootstrap JS từ CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

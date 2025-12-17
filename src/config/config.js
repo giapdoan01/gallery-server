@@ -5,10 +5,10 @@ module.exports = {
     // Server
     env: process.env.NODE_ENV || 'development',
     
-    // ✅ Render sẽ tự động set PORT, không dùng 2567
+    // Port
     port: parseInt(process.env.PORT) || 2567,
     
-    // ✅ Đổi từ 'localhost' → '0.0.0.0' để Render có thể access
+    // Host
     host: process.env.HOST || '0.0.0.0',
     
     // CORS
@@ -17,6 +17,17 @@ module.exports = {
     // Colyseus
     maxPlayers: parseInt(process.env.MAX_PLAYERS) || 50,
     roomName: process.env.ROOM_NAME || 'gallery',
+    
+    // JWT
+    jwtSecret: process.env.JWT_SECRET || 'art-gallery-secret-key-change-in-production',
+    jwtExpiresIn: process.env.JWT_EXPIRES_IN || '24h',
+    
+    // Session
+    sessionSecret: process.env.SESSION_SECRET || 'art-gallery-session-secret',
+    
+    // Admin user default (để tạo admin đầu tiên)
+    defaultAdminUser: process.env.DEFAULT_ADMIN_USER || 'admin',
+    defaultAdminPassword: process.env.DEFAULT_ADMIN_PASSWORD || 'admin123',
     
     // Spawn positions
     spawnPositions: [

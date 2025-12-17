@@ -1,0 +1,52 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card">
+        <div class="card-header">
+          <h2>Chỉnh sửa ảnh</h2>
+        </div>
+        <div class="card-body">
+          <% if (error && error.length > 0) { %>
+            <div class="alert alert-danger alert-dismissible fade show">
+              <%= error %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <% } %>
+          
+          <form action="/admin/images/edit/<%= image.id %>" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label for="name" class="form-label">Tên ảnh <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="name" name="name" value="<%= image.name %>" required>
+            </div>
+            
+            <div class="mb-3">
+              <label for="frameUse" class="form-label">Số Frame <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" id="frameUse" name="frameUse" value="<%= image.frameUse %>" required min="1">
+              <small class="text-muted">Mỗi frame chỉ được gán cho một ảnh</small>
+            </div>
+            
+            <% if (image.url) { %>
+              <div class="mb-3">
+                <label class="form-label">Ảnh hiện tại</label>
+                <div>
+                  <img src="<%= image.url %>" alt="<%= image.name %>" style="max-width: 300px; max-height: 200px;" class="img-thumbnail">
+                </div>
+              </div>
+            <% } %>
+            
+            <div class="mb-3">
+              <label for="image" class="form-label">Upload ảnh mới</label>
+              <input type="file" class="form-control" id="image" name="image" accept="image/*">
+              <small class="text-muted">Để trống nếu không muốn thay đổi ảnh</small>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+              <a href="/admin/images" class="btn btn-secondary">Hủy</a>
+              <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

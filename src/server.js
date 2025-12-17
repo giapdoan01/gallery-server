@@ -2,17 +2,25 @@
 const { createServer } = require('http');
 const { Server } = require('colyseus');
 const { monitor } = require('@colyseus/monitor');
+const path = require('path');
 const createApp = require('./app');
 const config = require('./config/config');
 const GalleryRoom = require('./colyseus/rooms/GalleryRoom');
 const LoggerService = require('./services/logger.service');
 const RoomService = require('./services/room.service');
-
+const { sequelize, testConnection } = require('./config/database'); 
+const { initDatabase } = require('./utils/db-init.util'); 
+require('dotenv').config();
 /**
  * Start Server
  */
 async function startServer() {
     try {
+        // 0. Initialize database
+        LoggerService.info('Initializing database...');
+        await initDatabase();
+        LoggerService.success('Database initialized successfully');
+
         // 1. Create Express app
         const app = createApp();
 
@@ -60,6 +68,7 @@ async function startServer() {
                     health: '/health',
                     api: '/api',
                     monitor: '/monitor',
+                    admin: '/admin',
                     websocket: req.protocol === 'https' 
                         ? 'wss://' + req.get('host') 
                         : 'ws://' + req.get('host')
@@ -89,6 +98,7 @@ async function startServer() {
             } else {
                 console.log(`║   🌐 API: http://localhost:${port}/api${' '.repeat(24)}║
 ║   📊 Monitor: http://localhost:${port}/monitor${' '.repeat(18)}║
+║   👑 Admin: http://localhost:${port}/admin${' '.repeat(21)}║
 ║   🎮 WebSocket: ws://localhost:${port}${' '.repeat(22)}║`);
             }
 
@@ -116,6 +126,10 @@ async function startServer() {
         process.on('SIGTERM', async () => {
             LoggerService.warning('⚠️  SIGTERM received, shutting down gracefully...');
             await gameServer.gracefullyShutdown();
+            // Close database connection
+            await sequelize.close();
+            LoggerService.info('Database connection closed');
+            
             httpServer.close(() => {
                 LoggerService.success('✅ Server closed');
                 process.exit(0);
@@ -125,6 +139,10 @@ async function startServer() {
         process.on('SIGINT', async () => {
             LoggerService.warning('⚠️  SIGINT received, shutting down gracefully...');
             await gameServer.gracefullyShutdown();
+            // Close database connection
+            await sequelize.close();
+            LoggerService.info('Database connection closed');
+            
             httpServer.close(() => {
                 LoggerService.success('✅ Server closed');
                 process.exit(0);
