@@ -43,12 +43,14 @@ class ImageController {
    */
   static async createImage(req, res) {
     try {
-      const { name, frameUse } = req.body;
+      const { name, frameUse, author, description } = req.body;
       const userId = req.user.id;
 
       let imageData = {
         name,
         frameUse: parseInt(frameUse),
+        author: author || '', // Thêm trường author
+        description: description || '', // Thêm trường description
         url: '',
         publicId: ''
       };
@@ -104,7 +106,7 @@ class ImageController {
   static async updateImage(req, res) {
     try {
       const { id } = req.params;
-      const { name, frameUse } = req.body;
+      const { name, frameUse, author, description } = req.body;
       const userId = req.user.id;
 
       const image = await ImageService.getImageById(id);
@@ -117,6 +119,8 @@ class ImageController {
       let imageData = {
         name,
         frameUse: parseInt(frameUse),
+        author: author || '', // Thêm trường author
+        description: description || '', // Thêm trường description
         url: image.url,
         publicId: image.publicId
       };
@@ -184,7 +188,9 @@ class ImageController {
           id: image.id,
           name: image.name,
           url: image.url,
-          frameUse: image.frameUse
+          frameUse: image.frameUse,
+          author: image.author, // Thêm trường author
+          description: image.description // Thêm trường description
         }
       });
     } catch (error) {

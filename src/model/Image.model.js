@@ -43,6 +43,8 @@ class ImageModel {
         url: image.url,
         frameUse: image.frameUse,
         publicId: image.publicId,
+        author: image.author || '', // Thêm trường author
+        description: image.description || '', // Thêm trường description
         createdAt: image.created_at,
         updatedAt: image.updated_at,
         createdBy: image.createdBy,
@@ -79,6 +81,8 @@ class ImageModel {
         url: data.url,
         frameUse: data.frameUse,
         publicId: data.publicId,
+        author: data.author || '', // Thêm trường author
+        description: data.description || '', // Thêm trường description
         createdAt: data.created_at,
         updatedAt: data.updated_at,
         createdBy: data.createdBy,
@@ -121,6 +125,8 @@ class ImageModel {
         url: data.url,
         frameUse: data.frameUse,
         publicId: data.publicId,
+        author: data.author || '', // Thêm trường author
+        description: data.description || '', // Thêm trường description
         createdAt: data.created_at,
         updatedAt: data.updated_at,
         createdBy: data.createdBy,
@@ -144,6 +150,8 @@ class ImageModel {
           url: imageData.url,
           frameUse: imageData.frameUse,
           publicId: imageData.publicId,
+          author: imageData.author || '', // Thêm trường author
+          description: imageData.description || '', // Thêm trường description
           createdBy: imageData.createdBy,
           lastUpdatedBy: imageData.lastUpdatedBy
         })
@@ -159,6 +167,8 @@ class ImageModel {
         url: image.url,
         frameUse: image.frameUse,
         publicId: image.publicId,
+        author: image.author || '', // Thêm trường author
+        description: image.description || '', // Thêm trường description
         createdAt: image.created_at,
         updatedAt: image.updated_at,
         createdBy: image.createdBy,
@@ -182,6 +192,8 @@ class ImageModel {
           url: imageData.url,
           frameUse: imageData.frameUse,
           publicId: imageData.publicId,
+          author: imageData.author || '', // Thêm trường author
+          description: imageData.description || '', // Thêm trường description
           lastUpdatedBy: imageData.lastUpdatedBy
         })
         .eq('id', id)
@@ -199,6 +211,8 @@ class ImageModel {
         url: image.url,
         frameUse: image.frameUse,
         publicId: image.publicId,
+        author: image.author || '', // Thêm trường author
+        description: image.description || '', // Thêm trường description
         createdAt: image.created_at,
         updatedAt: image.updated_at,
         createdBy: image.createdBy,
@@ -210,24 +224,7 @@ class ImageModel {
     }
   }
   
-  /**
-   * Xóa hình ảnh
-   */
-  static async destroy(id) {
-    try {
-      const { error } = await supabase
-        .from('images')
-        .delete()
-        .eq('id', id);
-        
-      if (error) throw error;
-      
-      return true;
-    } catch (error) {
-      LoggerService.error(`Error deleting image with ID ${id}:`, error.message);
-      throw error;
-    }
-  }
+  // Phương thức destroy không cần thay đổi vì không liên quan đến các trường mới
 }
 
 module.exports = ImageModel;

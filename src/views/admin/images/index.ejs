@@ -30,6 +30,8 @@
           <th>Ảnh</th>
           <th>Tên</th>
           <th>Frame</th>
+          <th>Tác giả</th>
+          <th>Mô tả</th>
           <th>URL</th>
           <th>Ngày tạo</th>
           <th>Thao tác</th>
@@ -49,6 +51,8 @@
               </td>
               <td><%= image.name %></td>
               <td><%= image.frameUse %></td>
+              <td><%= image.author || 'Không có' %></td>
+              <td class="text-truncate" style="max-width: 200px;"><%= image.description || 'Không có' %></td>
               <td>
                 <% if (image.url) { %>
                   <a href="<%= image.url %>" target="_blank" class="text-truncate d-inline-block" style="max-width: 200px;">
@@ -78,7 +82,7 @@
           <% }); %>
         <% } else { %>
           <tr>
-            <td colspan="7" class="text-center">Không có ảnh nào</td>
+            <td colspan="9" class="text-center">Không có ảnh nào</td>
           </tr>
         <% } %>
       </tbody>
