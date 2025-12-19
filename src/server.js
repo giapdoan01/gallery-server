@@ -6,15 +6,34 @@ const path = require('path');
 const createApp = require('./app');
 const config = require('./config/config');
 const GalleryRoom = require('./colyseus/rooms/GalleryRoom');
+const AdminGalleryRoom = require('./colyseus/rooms/AdminGalleryRoom'); // Thêm import AdminGalleryRoom
 const LoggerService = require('./services/logger.service');
 const RoomService = require('./services/room.service');
 const { sequelize, testConnection } = require('./config/database'); 
-const { initDatabase } = require('./utils/db-init.util'); 
+const { initDatabase } = require('./utils/db-init.util');
+const { checkSupabaseConnection } = require('./utils/check-connection');
+
 require('dotenv').config();
 /**
  * Start Server
  */
 async function startServer() {
+    // Kiểm tra kết nối đến Supabase
+    const isConnected = await checkSupabaseConnection();
+    
+    if (!isConnected) {
+        console.error('❌ Không thể kết nối đến Supabase, vui lòng kiểm tra cấu hình kết nối');
+        // Tùy chọn: process.exit(1); nếu muốn dừng server khi không kết nối được
+    } else {
+        // Khởi tạo dữ liệu cơ bản
+        await initDatabase();
+        
+        // Khởi động server
+        const PORT = process.env.PORT || 3000;
+        app.listen(PORT, () => {
+        console.log(`Server đang chạy trên port ${PORT}`);
+        });
+    }
     try {
         // 0. Initialize database
         LoggerService.info('Initializing database...');
@@ -38,9 +57,13 @@ async function startServer() {
         // 4. Set game server to RoomService
         RoomService.setGameServer(gameServer);
 
-        // 5. Register Colyseus room
+        // 5. Register Colyseus rooms
         gameServer.define(config.roomName, GalleryRoom);
         LoggerService.success(`Room "${config.roomName}" registered`);
+
+        // Thêm đăng ký room admin
+        gameServer.define(config.adminRoomName, AdminGalleryRoom);
+        LoggerService.success(`Admin Room "${config.adminRoomName}" registered`);
 
         // 6. Colyseus monitor
         app.use('/monitor', monitor());
@@ -104,6 +127,7 @@ async function startServer() {
 
             console.log(`║                                                       ║
 ║   📡 Room: "${config.roomName}" (max ${config.maxPlayers} players)${' '.repeat(14)}║
+║   👑 Admin Room: "${config.adminRoomName}" (max 3 admins)${' '.repeat(10)}║
 ║                                                       ║
 ╚═══════════════════════════════════════════════════════╝
             `);

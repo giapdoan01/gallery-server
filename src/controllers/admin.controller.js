@@ -1,4 +1,4 @@
-const User = require('../model/User.model'); // Sửa từ model thành models
+const UserModel = require('../model/User.model');
 const AuthService = require('../services/auth.service');
 const LoggerService = require('../services/logger.service');
 

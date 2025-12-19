@@ -1,27 +1,15 @@
-const { Sequelize } = require('sequelize');
-const path = require('path');
-const config = require('./config');
+const { createClient } = require('@supabase/supabase-js');
+const LoggerService = require('../services/logger.service');
 
-// Tạo instance Sequelize kết nối với SQLite
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: path.join(__dirname, '../../database.sqlite'),
-  logging: config.env === 'development' ? console.log : false,
-});
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
 
-// Kiểm tra kết nối
-async function testConnection() {
-  try {
-    await sequelize.authenticate();
-    console.log('Database connection established successfully.');
-    return true;
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
-    return false;
-  }
+// Kiểm tra biến môi trường
+if (!supabaseUrl || !supabaseKey) {
+  LoggerService.error('SUPABASE_URL hoặc SUPABASE_KEY chưa được thiết lập');
+  LoggerService.error('Hãy kiểm tra file .env của bạn');
 }
 
-module.exports = {
-  sequelize,
-  testConnection
-};
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+module.exports = supabase;

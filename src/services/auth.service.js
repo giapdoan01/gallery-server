@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../model/User.model');
+const UserModel = require('../model/User.model');
 const config = require('../config/config');
 
 // JWT Secret Key (nên đặt trong .env)
@@ -13,14 +13,14 @@ class AuthService {
   static async login(username, password) {
     try {
       // Tìm user trong database
-      const user = await User.findOne({ where: { username, isActive: true } });
+      const user = await UserModel.findByUsername(username);
       
-      if (!user) {
-        throw new Error('Tài khoản không tồn tại');
+      if (!user || !user.isActive) {
+        throw new Error('Tài khoản không tồn tại hoặc đã bị vô hiệu hóa');
       }
       
       // Kiểm tra password
-      const isMatch = await user.comparePassword(password);
+      const isMatch = await UserModel.comparePassword(user.password, password);
       if (!isMatch) {
         throw new Error('Mật khẩu không đúng');
       }
@@ -51,10 +51,10 @@ class AuthService {
   static async verifyToken(token) {
     try {
       const decoded = jwt.verify(token, JWT_SECRET);
-      const user = await User.findOne({ where: { id: decoded.id, isActive: true } });
+      const user = await UserModel.findById(decoded.id);
       
-      if (!user) {
-        throw new Error('Người dùng không tồn tại');
+      if (!user || !user.isActive) {
+        throw new Error('Người dùng không tồn tại hoặc đã bị vô hiệu hóa');
       }
       
       return decoded;

@@ -58,7 +58,13 @@
                   <span class="text-muted">Không có URL</span>
                 <% } %>
               </td>
-              <td><%= new Date(image.createdAt).toLocaleString('vi-VN') %></td>
+              <td>
+                <% if (image.createdAt) { %>
+                  <%= new Date(image.createdAt).toLocaleString('vi-VN') %>
+                <% } else { %>
+                  Không có
+                <% } %>
+              </td>
               <td>
                 <a href="/admin/images/edit/<%= image.id %>" class="btn btn-sm btn-info">
                   <i class="bi bi-pencil"></i>

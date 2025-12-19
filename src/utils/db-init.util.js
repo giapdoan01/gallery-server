@@ -1,126 +1,74 @@
 // src/utils/db-init.util.js
-const { sequelize } = require('../config/database');
-const config = require('../config/config');
-const LoggerService = require('../services/logger.service');
 const bcrypt = require('bcryptjs');
+const LoggerService = require('../services/logger.service');
+const UserModel = require('../model/User.model');
 
 /**
- * Khởi tạo mô hình User cho Admin
+ * Kiểm tra xem đã có tài khoản admin chưa
  */
-function defineUserModel() {
-  const { DataTypes } = require('sequelize');
-  
-  const User = sequelize.define('User', {
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        len: [3, 50]
-      }
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    role: {
-      type: DataTypes.STRING,
-      defaultValue: 'admin',
-      validate: {
-        isIn: [['admin', 'editor']]
-      }
-    },
-    isActive: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true
-    }
-  });
-  
-  // Phương thức so sánh mật khẩu
-  User.prototype.comparePassword = async function(candidatePassword) {
-    return await bcrypt.compare(candidatePassword, this.password);
-  };
-  
-  return User;
+async function checkAdminExists() {
+  try {
+    const admins = await UserModel.findAll({ role: 'admin' });
+    return admins && admins.length > 0;
+  } catch (error) {
+    LoggerService.error('Failed to check admin existence:', error.message);
+    throw error;
+  }
 }
 
 /**
- * Khởi tạo mô hình Image cho quản lý ảnh
+ * Tạo tài khoản admin mặc định
  */
-function defineImageModel() {
-  const { DataTypes } = require('sequelize');
-  
-  const Image = sequelize.define('Image', {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    url: {
-      type: DataTypes.STRING,
-      allowNull: true // Cho phép URL trống
-    },
-    frameUse: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      unique: true // Đảm bảo số frame không trùng nhau
-    },
-    publicId: {
-      type: DataTypes.STRING,
-      allowNull: true // ID của ảnh trên Cloudinary
-    },
-    createdBy: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
-    lastUpdatedBy: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    }
-  });
-  
-  return Image;
+async function createDefaultAdmin() {
+  try {
+    const adminData = {
+      username: 'admin',
+      password: 'admin123',
+      role: 'admin',
+      isActive: true
+    };
+    
+    const admin = await UserModel.create(adminData);
+    
+    LoggerService.success('Default admin account created:');
+    LoggerService.info('Username: admin');
+    LoggerService.info('Password: admin123');
+    
+    return admin;
+  } catch (error) {
+    LoggerService.error('Failed to create default admin:', error.message);
+    throw error;
+  }
 }
 
 /**
- * Hàm khởi tạo database
+ * Khởi tạo dữ liệu cơ bản
  */
 async function initDatabase() {
   try {
-    // Đồng bộ hóa model với database
-    const User = defineUserModel();
-    const Image = defineImageModel();
+    LoggerService.info('Checking for admin user...');
     
-    await sequelize.sync();
-    LoggerService.success('Database synchronized');
+    // Kiểm tra và tạo admin nếu cần
+    const adminExists = await checkAdminExists();
     
-    // Kiểm tra xem đã có tài khoản admin chưa
-    const adminCount = await User.count();
-    
-    if (adminCount === 0) {
-      // Tạo tài khoản admin mặc định
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash('admin123', salt);
-      
-      await User.create({
-        username: 'admin',
-        password: hashedPassword,
-        role: 'admin'
-      });
-      
-      LoggerService.success('Default admin account created:');
-      LoggerService.info('Username: admin');
-      LoggerService.info('Password: admin123');
+    if (!adminExists) {
+      LoggerService.info('No admin user found, creating default admin...');
+      await createDefaultAdmin();
+    } else {
+      LoggerService.info('Admin user already exists');
     }
     
+    LoggerService.success('Database initialization completed');
     return true;
   } catch (error) {
-    LoggerService.error('Failed to initialize database:', error.message);
-    throw error;
+    LoggerService.error('Database initialization failed:', error.message);
+    // Không throw lỗi để ứng dụng vẫn chạy được
+    return false;
   }
 }
 
 module.exports = {
   initDatabase,
-  defineUserModel,
-  defineImageModel
+  checkAdminExists,
+  createDefaultAdmin
 };

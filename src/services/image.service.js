@@ -1,6 +1,7 @@
 // src/services/image.service.js
 const Image = require('../model/Image.model');
 const LoggerService = require('./logger.service');
+const { Op } = require('@supabase/supabase-js');
 
 class ImageService {
   /**
@@ -88,19 +89,19 @@ class ImageService {
           where: { frameUse: imageData.frameUse }
         });
 
-        if (existingFrame && existingFrame.id !== parseInt(id)) {
+        if (existingFrame && existingFrame.id !== id) {
           throw new Error(`Frame ${imageData.frameUse} đã được sử dụng`);
         }
       }
 
       // Cập nhật thông tin ảnh
-      await image.update({
+      const updatedImage = await Image.update(id, {
         ...imageData,
         lastUpdatedBy: userId
       });
 
       LoggerService.success(`Image ID ${id} updated successfully`);
-      return image;
+      return updatedImage;
     } catch (error) {
       LoggerService.error(`Failed to update image ID ${id}:`, error.message);
       throw error;
@@ -161,7 +162,7 @@ class ImageService {
       }
 
       // Xóa bản ghi trong database
-      await image.destroy();
+      await Image.destroy(id);
       LoggerService.success(`Image record ID ${id} deleted successfully from database`);
       return true;
     } catch (error) {
@@ -248,16 +249,19 @@ class ImageService {
 
   /**
    * Hàm cập nhật lại publicId đúng từ URL
+   * Cần chỉnh sửa để hoạt động với Supabase
    */
+  /**
+ * Hàm cập nhật lại publicId đúng từ URL
+ */
   static async fixPublicIds() {
     try {
-      const images = await Image.findAll({
-        where: {
-          url: {
-            [Op.like]: '%cloudinary.com%'
-          }
-        }
-      });
+      const { data: images, error } = await supabase
+        .from('images')
+        .select('*')
+        .ilike('url', '%cloudinary.com%');
+        
+      if (error) throw error;
       
       LoggerService.info(`Found ${images.length} Cloudinary images to fix`);
       
@@ -265,7 +269,6 @@ class ImageService {
         try {
           // Phân tích URL để lấy publicId chính xác
           const url = image.url;
-          const urlParts = url.split('/');
           const v1Index = url.indexOf('/v1/');
           
           if (v1Index > -1) {
@@ -280,7 +283,13 @@ class ImageService {
               
               if (fullId !== image.publicId) {
                 LoggerService.info(`Fixing image ${image.id}: Old publicId=${image.publicId}, New publicId=${fullId}`);
-                await image.update({ publicId: fullId });
+                
+                const { error: updateError } = await supabase
+                  .from('images')
+                  .update({ publicId: fullId })
+                  .eq('id', image.id);
+                  
+                if (updateError) throw updateError;
               }
             }
           }

@@ -17,6 +17,7 @@ module.exports = {
     // Colyseus
     maxPlayers: parseInt(process.env.MAX_PLAYERS) || 50,
     roomName: process.env.ROOM_NAME || 'gallery',
+    adminRoomName: process.env.ADMIN_ROOM_NAME || 'admingallery', // Thêm dòng này
     
     // JWT
     jwtSecret: process.env.JWT_SECRET || 'art-gallery-secret-key-change-in-production',

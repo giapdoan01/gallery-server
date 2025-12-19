@@ -12,7 +12,10 @@ const loggerMiddleware = require('./middleware/logger.middleware');
 const { errorMiddleware, notFoundMiddleware } = require('./middleware/error.middleware');
 const apiRoutes = require('./routes');
 const adminRoutes = require('./routes/admin.routes');
+const apiImageRoutes = require('./routes/api.image.routes');
 const ResponseUtil = require('./utils/response.util');
+const { checkSupabaseConnection } = require('./utils/check-connection');
+const { initDatabase } = require('./utils/db-init.util');
 
 /**
  * Create Express App
@@ -83,6 +86,9 @@ function createApp() {
     
     // Admin routes
     app.use('/admin', adminRoutes);
+    
+    // API Image routes
+    app.use('/api', apiImageRoutes);
 
     // 404 handler
     app.use(notFoundMiddleware);
