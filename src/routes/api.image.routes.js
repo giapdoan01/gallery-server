@@ -142,7 +142,11 @@ router.put('/images/frame/:frame', upload.single('image'), async (req, res) => {
   try {
     const { frame } = req.params;
     const frameId = parseInt(frame);
-    const { name } = req.body;
+    const { 
+      name, author, description, 
+      positionX, positionY, positionZ,
+      rotationX, rotationY, rotationZ 
+    } = req.body;
 
     // Tìm ảnh theo frame
     const image = await ImageService.getImageByFrame(frameId);
@@ -158,7 +162,16 @@ router.put('/images/frame/:frame', upload.single('image'), async (req, res) => {
       name,
       frameUse: frameId, // Giữ nguyên frame
       url: image.url,
-      publicId: image.publicId
+      publicId: image.publicId,
+      author: author || image.author || '',
+      description: description || image.description || '',
+      // Thêm các trường vị trí và xoay
+      positionX: parseFloat(positionX || image.positionX || 0),
+      positionY: parseFloat(positionY || image.positionY || 0),
+      positionZ: parseFloat(positionZ || image.positionZ || 0),
+      rotationX: parseFloat(rotationX || image.rotationX || 0),
+      rotationY: parseFloat(rotationY || image.rotationY || 0),
+      rotationZ: parseFloat(rotationZ || image.rotationZ || 0)
     };
 
     if (req.file) {
