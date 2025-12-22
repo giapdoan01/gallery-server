@@ -43,8 +43,15 @@ class ImageModel {
         url: image.url,
         frameUse: image.frameUse,
         publicId: image.publicId,
-        author: image.author || '', // Thêm trường author
-        description: image.description || '', // Thêm trường description
+        author: image.author || '',
+        description: image.description || '',
+        // Thêm các trường vị trí và xoay
+        positionX: image.positionX || 0,
+        positionY: image.positionY || 0,
+        positionZ: image.positionZ || 0,
+        rotationX: image.rotationX || 0,
+        rotationY: image.rotationY || 0,
+        rotationZ: image.rotationZ || 0,
         createdAt: image.created_at,
         updatedAt: image.updated_at,
         createdBy: image.createdBy,
@@ -81,8 +88,15 @@ class ImageModel {
         url: data.url,
         frameUse: data.frameUse,
         publicId: data.publicId,
-        author: data.author || '', // Thêm trường author
-        description: data.description || '', // Thêm trường description
+        author: data.author || '',
+        description: data.description || '',
+        // Thêm các trường vị trí và xoay
+        positionX: data.positionX || 0,
+        positionY: data.positionY || 0,
+        positionZ: data.positionZ || 0,
+        rotationX: data.rotationX || 0,
+        rotationY: data.rotationY || 0,
+        rotationZ: data.rotationZ || 0,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
         createdBy: data.createdBy,
@@ -125,8 +139,15 @@ class ImageModel {
         url: data.url,
         frameUse: data.frameUse,
         publicId: data.publicId,
-        author: data.author || '', // Thêm trường author
-        description: data.description || '', // Thêm trường description
+        author: data.author || '',
+        description: data.description || '',
+        // Thêm các trường vị trí và xoay
+        positionX: data.positionX || 0,
+        positionY: data.positionY || 0,
+        positionZ: data.positionZ || 0,
+        rotationX: data.rotationX || 0,
+        rotationY: data.rotationY || 0,
+        rotationZ: data.rotationZ || 0,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
         createdBy: data.createdBy,
@@ -150,8 +171,15 @@ class ImageModel {
           url: imageData.url,
           frameUse: imageData.frameUse,
           publicId: imageData.publicId,
-          author: imageData.author || '', // Thêm trường author
-          description: imageData.description || '', // Thêm trường description
+          author: imageData.author || '',
+          description: imageData.description || '',
+          // Thêm các trường vị trí và xoay
+          positionX: imageData.positionX || 0,
+          positionY: imageData.positionY || 0,
+          positionZ: imageData.positionZ || 0,
+          rotationX: imageData.rotationX || 0,
+          rotationY: imageData.rotationY || 0,
+          rotationZ: imageData.rotationZ || 0,
           createdBy: imageData.createdBy,
           lastUpdatedBy: imageData.lastUpdatedBy
         })
@@ -167,8 +195,14 @@ class ImageModel {
         url: image.url,
         frameUse: image.frameUse,
         publicId: image.publicId,
-        author: image.author || '', // Thêm trường author
-        description: image.description || '', // Thêm trường description
+        author: image.author || '',
+        description: image.description || '',
+        positionX: image.positionX || 0,
+        positionY: image.positionY || 0,
+        positionZ: image.positionZ || 0,
+        rotationX: image.rotationX || 0,
+        rotationY: image.rotationY || 0,
+        rotationZ: image.rotationZ || 0,
         createdAt: image.created_at,
         updatedAt: image.updated_at,
         createdBy: image.createdBy,
@@ -192,8 +226,15 @@ class ImageModel {
           url: imageData.url,
           frameUse: imageData.frameUse,
           publicId: imageData.publicId,
-          author: imageData.author || '', // Thêm trường author
-          description: imageData.description || '', // Thêm trường description
+          author: imageData.author || '',
+          description: imageData.description || '',
+          // Thêm các trường vị trí và xoay
+          positionX: imageData.positionX || 0,
+          positionY: imageData.positionY || 0,
+          positionZ: imageData.positionZ || 0,
+          rotationX: imageData.rotationX || 0,
+          rotationY: imageData.rotationY || 0,
+          rotationZ: imageData.rotationZ || 0,
           lastUpdatedBy: imageData.lastUpdatedBy
         })
         .eq('id', id)
@@ -211,8 +252,14 @@ class ImageModel {
         url: image.url,
         frameUse: image.frameUse,
         publicId: image.publicId,
-        author: image.author || '', // Thêm trường author
-        description: image.description || '', // Thêm trường description
+        author: image.author || '',
+        description: image.description || '',
+        positionX: image.positionX || 0,
+        positionY: image.positionY || 0,
+        positionZ: image.positionZ || 0,
+        rotationX: image.rotationX || 0,
+        rotationY: image.rotationY || 0,
+        rotationZ: image.rotationZ || 0,
         createdAt: image.created_at,
         updatedAt: image.updated_at,
         createdBy: image.createdBy,
@@ -224,7 +271,24 @@ class ImageModel {
     }
   }
   
-  // Phương thức destroy không cần thay đổi vì không liên quan đến các trường mới
+  /**
+   * Xóa hình ảnh
+   */
+  static async destroy(id) {
+    try {
+      const { error } = await supabase
+        .from('images')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      return true;
+    } catch (error) {
+      LoggerService.error(`Error deleting image with ID ${id}:`, error.message);
+      throw error;
+    }
+  }
 }
 
 module.exports = ImageModel;

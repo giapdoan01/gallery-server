@@ -43,14 +43,25 @@ class ImageController {
    */
   static async createImage(req, res) {
     try {
-      const { name, frameUse, author, description } = req.body;
+      const { 
+        name, frameUse, author, description, 
+        positionX, positionY, positionZ,
+        rotationX, rotationY, rotationZ
+      } = req.body;
       const userId = req.user.id;
 
       let imageData = {
         name,
         frameUse: parseInt(frameUse),
-        author: author || '', // Thêm trường author
-        description: description || '', // Thêm trường description
+        author: author || '',
+        description: description || '',
+        // Thêm các trường vị trí và xoay
+        positionX: parseFloat(positionX || 0),
+        positionY: parseFloat(positionY || 0),
+        positionZ: parseFloat(positionZ || 0),
+        rotationX: parseFloat(rotationX || 0),
+        rotationY: parseFloat(rotationY || 0),
+        rotationZ: parseFloat(rotationZ || 0),
         url: '',
         publicId: ''
       };
@@ -106,7 +117,11 @@ class ImageController {
   static async updateImage(req, res) {
     try {
       const { id } = req.params;
-      const { name, frameUse, author, description } = req.body;
+      const { 
+        name, frameUse, author, description, 
+        positionX, positionY, positionZ,
+        rotationX, rotationY, rotationZ
+      } = req.body;
       const userId = req.user.id;
 
       const image = await ImageService.getImageById(id);
@@ -119,8 +134,15 @@ class ImageController {
       let imageData = {
         name,
         frameUse: parseInt(frameUse),
-        author: author || '', // Thêm trường author
-        description: description || '', // Thêm trường description
+        author: author || '',
+        description: description || '',
+        // Thêm các trường vị trí và xoay
+        positionX: parseFloat(positionX || 0),
+        positionY: parseFloat(positionY || 0),
+        positionZ: parseFloat(positionZ || 0),
+        rotationX: parseFloat(rotationX || 0),
+        rotationY: parseFloat(rotationY || 0),
+        rotationZ: parseFloat(rotationZ || 0),
         url: image.url,
         publicId: image.publicId
       };
@@ -189,8 +211,19 @@ class ImageController {
           name: image.name,
           url: image.url,
           frameUse: image.frameUse,
-          author: image.author, // Thêm trường author
-          description: image.description // Thêm trường description
+          author: image.author,
+          description: image.description,
+          // Thêm các trường vị trí và xoay
+          position: {
+            x: image.positionX || 0,
+            y: image.positionY || 0,
+            z: image.positionZ || 0
+          },
+          rotation: {
+            x: image.rotationX || 0,
+            y: image.rotationY || 0,
+            z: image.rotationZ || 0
+          }
         }
       });
     } catch (error) {

@@ -1,36 +1,82 @@
 <div class="container-fluid">
   <h1 class="mb-4">Chỉnh sửa ảnh</h1>
-          <% if (error && error.length > 0) { %>
-            <div class="alert alert-danger alert-dismissible fade show">
-              <%= error %>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          <% } %>
+  <% if (error && error.length > 0) { %>
+    <div class="alert alert-danger alert-dismissible fade show">
+      <%= error %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
           
   <div class="card">
     <div class="card-body">
-          <form action="/admin/images/edit/<%= image.id %>" method="POST" enctype="multipart/form-data">
-            <div class="mb-3">
+      <form action="/admin/images/edit/<%= image.id %>" method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
           <label for="name" class="form-label">Tên ảnh</label>
-              <input type="text" class="form-control" id="name" name="name" value="<%= image.name %>" required>
-            </div>
+          <input type="text" class="form-control" id="name" name="name" value="<%= image.name %>" required>
+        </div>
             
-            <div class="mb-3">
+        <div class="mb-3">
           <label for="frameUse" class="form-label">Frame</label>
           <input type="number" class="form-control" id="frameUse" name="frameUse" value="<%= image.frameUse %>" required>
-            </div>
+        </div>
             
         <!-- Thêm trường Author -->
-              <div class="mb-3">
+        <div class="mb-3">
           <label for="author" class="form-label">Tác giả</label>
           <input type="text" class="form-control" id="author" name="author" value="<%= image.author || '' %>">
         </div>
         
         <!-- Thêm trường Description -->
-            <div class="mb-3">
+        <div class="mb-3">
           <label for="description" class="form-label">Mô tả</label>
           <textarea class="form-control" id="description" name="description" rows="3"><%= image.description || '' %></textarea>
+        </div>
+        
+        <!-- Thêm trường Position -->
+        <div class="card mb-3">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">Vị trí trong không gian</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="positionX" class="form-label">Vị trí X</label>
+                <input type="number" step="0.01" class="form-control" id="positionX" name="positionX" value="<%= image.positionX || 0 %>">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="positionY" class="form-label">Vị trí Y</label>
+                <input type="number" step="0.01" class="form-control" id="positionY" name="positionY" value="<%= image.positionY || 0 %>">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="positionZ" class="form-label">Vị trí Z</label>
+                <input type="number" step="0.01" class="form-control" id="positionZ" name="positionZ" value="<%= image.positionZ || 0 %>">
+              </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Thêm trường Rotation -->
+        <div class="card mb-3">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">Xoay trong không gian</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="rotationX" class="form-label">Xoay X (độ)</label>
+                <input type="number" step="0.01" class="form-control" id="rotationX" name="rotationX" value="<%= image.rotationX || 0 %>">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="rotationY" class="form-label">Xoay Y (độ)</label>
+                <input type="number" step="0.01" class="form-control" id="rotationY" name="rotationY" value="<%= image.rotationY || 0 %>">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="rotationZ" class="form-label">Xoay Z (độ)</label>
+                <input type="number" step="0.01" class="form-control" id="rotationZ" name="rotationZ" value="<%= image.rotationZ || 0 %>">
+              </div>
+            </div>
+          </div>
+        </div>
             
         <div class="mb-3">
           <label for="image" class="form-label">Ảnh hiện tại</label>
@@ -47,13 +93,13 @@
           <label for="image" class="form-label">Tải ảnh mới</label>
           <input type="file" class="form-control" id="image" name="image" accept="image/*">
           <small class="text-muted">Chỉ tải lên nếu bạn muốn thay đổi ảnh hiện tại</small>
-      </div>
+        </div>
         
         <div class="d-flex gap-2">
           <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
           <a href="/admin/images" class="btn btn-secondary">Hủy</a>
-    </div>
+        </div>
       </form>
+    </div>
   </div>
-</div>
 </div>

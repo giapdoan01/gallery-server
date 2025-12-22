@@ -31,8 +31,8 @@
           <th>Tên</th>
           <th>Frame</th>
           <th>Tác giả</th>
-          <th>Mô tả</th>
-          <th>URL</th>
+          <th>Vị trí (x, y, z)</th>
+          <th>Xoay (x, y, z)</th>
           <th>Ngày tạo</th>
           <th>Thao tác</th>
         </tr>
@@ -52,15 +52,15 @@
               <td><%= image.name %></td>
               <td><%= image.frameUse %></td>
               <td><%= image.author || 'Không có' %></td>
-              <td class="text-truncate" style="max-width: 200px;"><%= image.description || 'Không có' %></td>
               <td>
-                <% if (image.url) { %>
-                  <a href="<%= image.url %>" target="_blank" class="text-truncate d-inline-block" style="max-width: 200px;">
-                    <%= image.url %>
-                  </a>
-                <% } else { %>
-                  <span class="text-muted">Không có URL</span>
-                <% } %>
+                <%= image.positionX || '0' %>,
+                <%= image.positionY || '0' %>,
+                <%= image.positionZ || '0' %>
+              </td>
+              <td>
+                <%= image.rotationX || '0' %>°,
+                <%= image.rotationY || '0' %>°,
+                <%= image.rotationZ || '0' %>°
               </td>
               <td>
                 <% if (image.createdAt) { %>
