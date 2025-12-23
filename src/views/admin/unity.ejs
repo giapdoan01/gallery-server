@@ -17,6 +17,8 @@
     </main>
 </div>
 
+<input type="file" id="file-input" accept="image/png,image/jpeg,image/jpg" style="display: none;" />
+
 <style>
     .unity-container {
         background: #444;
@@ -25,11 +27,10 @@
         width: 100%;
     }
     
-    /* Tạo tỷ lệ 16:9 cho container */
     .aspect-ratio-box {
         position: relative;
         width: 100%;
-        padding-top: 56.25%; /* Tỷ lệ 9:16 = 56.25% */
+        padding-top: 56.25%;
         overflow: hidden;
     }
     
@@ -51,19 +52,49 @@
     #unity-logo { width: 154px; height: 130px; background: #444; }
     #unity-progress-bar-empty { width: 141px; height: 18px; margin-top: 10px; background: #555; }
     #unity-progress-bar-full { width: 0%; height: 18px; margin-top: 10px; background: #4CAF50; }
-    
     #unity-warning { position: absolute; left: 50%; top: 5%; transform: translate(-50%); background: white; padding: 10px; display: none }
     
-    /* Media query cho màn hình nhỏ hơn */
     @media (max-width: 768px) {
         .aspect-ratio-box {
-            padding-top: 75%; /* Tỷ lệ 4:3 cho màn hình nhỏ hơn */
+            padding-top: 75%;
         }
     }
 </style>
 
 <script>
-    var buildUrl = "/unity"; // Thư mục chứa build Unity WebGL
+    var unityInstance = null;
+    var fileInput = document.getElementById('file-input');
+    
+    window.OpenFilePicker = function() {
+        console.log('[WebGL] OpenFilePicker called');
+        if (fileInput) {
+            fileInput.click();
+        } else {
+            console.error('[WebGL] file-input not found!');
+        }
+    };
+    
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            
+            console.log('[WebGL] File:', file.name, file.size, 'bytes');
+            
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                if (unityInstance) {
+                    unityInstance.SendMessage('ImageEditPopup', 'OnWebGLFileSelected', event.target.result);
+                    console.log('[WebGL] ✓ Sent to Unity');
+                }
+            };
+            reader.readAsDataURL(file);
+            fileInput.value = '';
+        });
+        console.log('[WebGL] ✓ file-input ready');
+    }
+    
+    var buildUrl = "/unity";
     var loaderUrl = buildUrl + "/ArtGalleryAdmin.loader.js";
     var config = {
         dataUrl: buildUrl + "/ArtGalleryAdmin.data",
@@ -81,25 +112,14 @@
     var progressBarFull = document.querySelector("#unity-progress-bar-full");
     var warningBanner = document.querySelector("#unity-warning");
 
-    // By default Unity keeps WebGL canvas render target size matched with
-    // the DOM size of the canvas element (scaled by window.devicePixelRatio)
-    // Set this to false if you want to decouple this synchronization from
-    // happening inside the engine, and you would instead like to size up
-    // the canvas DOM size and WebGL render target sizes yourself.
-    // config.matchWebGLToCanvasSize = false;
-
     if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         container.className = "unity-mobile";
-        // Avoid draining fillrate performance on mobile devices,
-        // and default/override low DPI mode on mobile browsers.
         config.devicePixelRatio = 1;
         unityShowBanner('WebGL builds are not supported on mobile devices.');
-    } else {
-        // Không cần thiết lập kích thước canvas ở đây vì đã được xử lý trong CSS
     }
+    
     loadingBar.style.display = "block";
 
-    // Kiểm tra xem file loader có tồn tại không
     fetch(loaderUrl)
         .then(response => {
             if (response.ok) {
@@ -108,24 +128,26 @@
                 script.onload = () => {
                     createUnityInstance(canvas, config, (progress) => {
                         progressBarFull.style.width = 100 * progress + "%";
-                    }).then((unityInstance) => {
+                    }).then((instance) => {
+                        unityInstance = instance;
                         loadingBar.style.display = "none";
+                        console.log('[WebGL] ✓ Unity loaded');
                     }).catch((message) => {
                         warningBanner.style.display = 'block';
-                        warningBanner.textContent = 'Lỗi khi tạo Unity instance: ' + message;
+                        warningBanner.textContent = 'Lỗi: ' + message;
                         loadingBar.style.display = "none";
                     });
                 };
                 document.body.appendChild(script);
             } else {
                 warningBanner.style.display = 'block';
-                warningBanner.textContent = 'Không tìm thấy Unity WebGL loader. Vui lòng kiểm tra thư mục /unity';
+                warningBanner.textContent = 'Không tìm thấy Unity loader';
                 loadingBar.style.display = "none";
             }
         })
         .catch(error => {
             warningBanner.style.display = 'block';
-            warningBanner.textContent = 'Lỗi khi tải Unity WebGL: ' + error;
+            warningBanner.textContent = 'Lỗi: ' + error;
             loadingBar.style.display = "none";
         });
 
