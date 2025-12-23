@@ -13,6 +13,9 @@ router.get('/logout', AdminController.logout);
 // Protected routes (cần xác thực)
 router.get('/', authMiddleware, AdminController.renderDashboard);
 
+// Unity Admin route
+router.get('/unity', authMiddleware, AdminController.renderUnityAdmin);
+
 // Image routes - quản lý ảnh trong admin
 router.use('/images', imageRoutes);
 

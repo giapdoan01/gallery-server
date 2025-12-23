@@ -61,6 +61,18 @@ class AdminController {
       layout: 'layouts/admin-layout'
     });
   }
+  
+  /**
+   * Render trang Unity Admin
+   */
+  static renderUnityAdmin(req, res) {
+    res.render('admin/unity', {
+      title: 'Unity Admin - Admin ArtGallery',
+      user: req.user,
+      path: '/admin/unity',
+      layout: 'layouts/admin-layout'
+    });
+  }
 }
 
 module.exports = AdminController;
