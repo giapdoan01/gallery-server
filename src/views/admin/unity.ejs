@@ -66,8 +66,9 @@
     var fileInput = document.getElementById('file-input');
     
     window.OpenFilePicker = function() {
-        console.log('[WebGL] OpenFilePicker called');
+        console.log('[WebGL] OpenFilePicker called from Unity');
         if (fileInput) {
+            console.log('[WebGL] Clicking file input...');
             fileInput.click();
         } else {
             console.error('[WebGL] file-input not found!');
@@ -77,21 +78,55 @@
     if (fileInput) {
         fileInput.addEventListener('change', function(e) {
             var file = e.target.files[0];
-            if (!file) return;
+            if (!file) {
+                console.log('[WebGL] No file selected');
+                return;
+            }
             
-            console.log('[WebGL] File:', file.name, file.size, 'bytes');
+            console.log('[WebGL] File selected:', file.name, file.size, 'bytes');
+            
+            // Kiểm tra kích thước (giới hạn 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File quá lớn! Vui lòng chọn ảnh dưới 10MB');
+                fileInput.value = '';
+                return;
+            }
             
             var reader = new FileReader();
             reader.onload = function(event) {
+                var base64 = event.target.result;
+                console.log('[WebGL] File loaded, base64 length:', base64.length);
+                
                 if (unityInstance) {
-                    unityInstance.SendMessage('ImageEditPopup', 'OnWebGLFileSelected', event.target.result);
-                    console.log('[WebGL] ✓ Sent to Unity');
+                    try {
+                        // ✅ TẠO JSON OBJECT
+                        var fileData = JSON.stringify({
+                            fileName: file.name,
+                            fileSize: file.size,
+                            base64Data: base64
+                        });
+                        
+                        console.log('[WebGL] Sending JSON to Unity:', file.name, file.size, 'bytes');
+                        unityInstance.SendMessage('ImageEditPopup', 'OnWebGLFileSelected', fileData);
+                        console.log('[WebGL] ✓ Sent successfully');
+                    } catch (err) {
+                        console.error('[WebGL] Error sending to Unity:', err);
+                    }
+                } else {
+                    console.error('[WebGL] Unity instance not ready!');
                 }
             };
+            
+            reader.onerror = function(error) {
+                console.error('[WebGL] FileReader error:', error);
+            };
+            
             reader.readAsDataURL(file);
             fileInput.value = '';
         });
         console.log('[WebGL] ✓ file-input ready');
+    } else {
+        console.error('[WebGL] CRITICAL: file-input not found!');
     }
     
     var buildUrl = "/unity";
@@ -131,7 +166,7 @@
                     }).then((instance) => {
                         unityInstance = instance;
                         loadingBar.style.display = "none";
-                        console.log('[WebGL] ✓ Unity loaded');
+                        console.log('[WebGL] ✓ Unity loaded successfully');
                     }).catch((message) => {
                         warningBanner.style.display = 'block';
                         warningBanner.textContent = 'Lỗi: ' + message;
