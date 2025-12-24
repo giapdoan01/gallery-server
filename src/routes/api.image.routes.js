@@ -25,6 +25,28 @@ router.get('/images', async (req, res) => {
     });
   }
 });
+// Lấy tất cả frame
+router.get('/frames', async (req, res) => {
+  try {
+    const images = await ImageService.getAllImages();
+    const frames = images.map(image => ({
+      id: image.id,
+      frameUse: image.frameUse,
+      name: image.name || ''
+    }));
+    
+    return res.status(200).json({
+      success: true,
+      data: frames
+    });
+  } catch (error) {
+    LoggerService.error(`API error - getFrames:`, error.message);
+    return res.status(500).json({
+      success: false,
+      message: `Lỗi server: ${error.message}`
+    });
+  }
+});
 
 // Lấy ảnh theo ID
 router.get('/images/:id', async (req, res) => {
