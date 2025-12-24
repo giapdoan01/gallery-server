@@ -77,11 +77,24 @@ router.get('/images/:id', async (req, res) => {
 // Tạo ảnh mới
 router.post('/images', upload.single('image'), async (req, res) => {
   try {
-    const { name, frameUse } = req.body;
+    const { 
+      name, frameUse, author, description,
+      positionX, positionY, positionZ,
+      rotationX, rotationY, rotationZ
+    } = req.body;
 
     let imageData = {
       name,
       frameUse: parseInt(frameUse),
+      author: author || '',
+      description: description || '',
+      // Thêm các trường vị trí và xoay
+      positionX: parseFloat(positionX || 0),
+      positionY: parseFloat(positionY || 0),
+      positionZ: parseFloat(positionZ || 0),
+      rotationX: parseFloat(rotationX || 0),
+      rotationY: parseFloat(rotationY || 0),
+      rotationZ: parseFloat(rotationZ || 0),
       url: '',
       publicId: ''
     };
