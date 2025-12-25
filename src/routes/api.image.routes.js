@@ -25,6 +25,7 @@ router.get('/images', async (req, res) => {
     });
   }
 });
+
 // Lấy tất cả frame
 router.get('/frames', async (req, res) => {
   try {
@@ -32,7 +33,8 @@ router.get('/frames', async (req, res) => {
     const frames = images.map(image => ({
       id: image.id,
       frameUse: image.frameUse,
-      name: image.name || ''
+      name: image.name || '',
+      imageType: image.imageType || 'ngang' // Thêm trường imageType
     }));
     
     return res.status(200).json({
@@ -78,7 +80,7 @@ router.get('/images/:id', async (req, res) => {
 router.post('/images', upload.single('image'), async (req, res) => {
   try {
     const { 
-      name, frameUse, author, description,
+      name, frameUse, author, description, imageType,
       positionX, positionY, positionZ,
       rotationX, rotationY, rotationZ
     } = req.body;
@@ -88,7 +90,8 @@ router.post('/images', upload.single('image'), async (req, res) => {
       frameUse: parseInt(frameUse),
       author: author || '',
       description: description || '',
-      // Thêm các trường vị trí và xoay
+      imageType: imageType || 'ngang', // Thêm trường imageType với giá trị mặc định là "ngang"
+      // Các trường vị trí và xoay
       positionX: parseFloat(positionX || 0),
       positionY: parseFloat(positionY || 0),
       positionZ: parseFloat(positionZ || 0),
@@ -126,7 +129,11 @@ router.post('/images', upload.single('image'), async (req, res) => {
 router.put('/images/:id', upload.single('image'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, frameUse } = req.body;
+    const { 
+      name, frameUse, author, description, imageType,
+      positionX, positionY, positionZ,
+      rotationX, rotationY, rotationZ 
+    } = req.body;
 
     const image = await ImageService.getImageById(id);
     
@@ -140,6 +147,16 @@ router.put('/images/:id', upload.single('image'), async (req, res) => {
     let imageData = {
       name,
       frameUse: parseInt(frameUse),
+      author: author || image.author || '',
+      description: description || image.description || '',
+      imageType: imageType || image.imageType || 'ngang', // Thêm trường imageType
+      // Các trường vị trí và xoay
+      positionX: parseFloat(positionX || image.positionX || 0),
+      positionY: parseFloat(positionY || image.positionY || 0),
+      positionZ: parseFloat(positionZ || image.positionZ || 0),
+      rotationX: parseFloat(rotationX || image.rotationX || 0),
+      rotationY: parseFloat(rotationY || image.rotationY || 0),
+      rotationZ: parseFloat(rotationZ || image.rotationZ || 0),
       url: image.url,
       publicId: image.publicId
     };
@@ -178,7 +195,7 @@ router.put('/images/frame/:frame', upload.single('image'), async (req, res) => {
     const { frame } = req.params;
     const frameId = parseInt(frame);
     const { 
-      name, author, description, 
+      name, author, description, imageType,
       positionX, positionY, positionZ,
       rotationX, rotationY, rotationZ 
     } = req.body;
@@ -200,7 +217,8 @@ router.put('/images/frame/:frame', upload.single('image'), async (req, res) => {
       publicId: image.publicId,
       author: author || image.author || '',
       description: description || image.description || '',
-      // Thêm các trường vị trí và xoay
+      imageType: imageType || image.imageType || 'ngang', // Thêm trường imageType
+      // Các trường vị trí và xoay
       positionX: parseFloat(positionX || image.positionX || 0),
       positionY: parseFloat(positionY || image.positionY || 0),
       positionZ: parseFloat(positionZ || image.positionZ || 0),
@@ -264,7 +282,7 @@ router.delete('/images/:id', async (req, res) => {
   }
 });
 
-// THÊM: Xóa ảnh theo frame
+//  Xóa ảnh theo frame
 router.delete('/images/frame/:frame', async (req, res) => {
   try {
     const { frame } = req.params;

@@ -44,7 +44,7 @@ class ImageController {
   static async createImage(req, res) {
     try {
       const { 
-        name, frameUse, author, description, 
+        name, frameUse, author, description, imageType,
         positionX, positionY, positionZ,
         rotationX, rotationY, rotationZ
       } = req.body;
@@ -55,7 +55,8 @@ class ImageController {
         frameUse: parseInt(frameUse),
         author: author || '',
         description: description || '',
-        // Thêm các trường vị trí và xoay
+        imageType: imageType || 'ngang', // Thêm trường imageType với giá trị mặc định là "ngang"
+        // Các trường vị trí và xoay
         positionX: parseFloat(positionX || 0),
         positionY: parseFloat(positionY || 0),
         positionZ: parseFloat(positionZ || 0),
@@ -118,7 +119,7 @@ class ImageController {
     try {
       const { id } = req.params;
       const { 
-        name, frameUse, author, description, 
+        name, frameUse, author, description, imageType,
         positionX, positionY, positionZ,
         rotationX, rotationY, rotationZ
       } = req.body;
@@ -136,7 +137,8 @@ class ImageController {
         frameUse: parseInt(frameUse),
         author: author || '',
         description: description || '',
-        // Thêm các trường vị trí và xoay
+        imageType: imageType || 'ngang', // Thêm trường imageType với giá trị mặc định là "ngang"
+        // Các trường vị trí và xoay
         positionX: parseFloat(positionX || 0),
         positionY: parseFloat(positionY || 0),
         positionZ: parseFloat(positionZ || 0),
@@ -213,7 +215,8 @@ class ImageController {
           frameUse: image.frameUse,
           author: image.author,
           description: image.description,
-          // Thêm các trường vị trí và xoay
+          imageType: image.imageType || 'ngang', // Thêm trường imageType
+          // Các trường vị trí và xoay
           position: {
             x: image.positionX || 0,
             y: image.positionY || 0,

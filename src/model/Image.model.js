@@ -45,7 +45,8 @@ class ImageModel {
         publicId: image.publicId,
         author: image.author || '',
         description: image.description || '',
-        // Thêm các trường vị trí và xoay
+        imageType: image.imageType || 'ngang', // Thêm trường imageType với giá trị mặc định là "ngang"
+        // Các trường vị trí và xoay
         positionX: image.positionX || 0,
         positionY: image.positionY || 0,
         positionZ: image.positionZ || 0,
@@ -90,7 +91,8 @@ class ImageModel {
         publicId: data.publicId,
         author: data.author || '',
         description: data.description || '',
-        // Thêm các trường vị trí và xoay
+        imageType: data.imageType || 'ngang', // Thêm trường imageType với giá trị mặc định là "ngang"
+        // Các trường vị trí và xoay
         positionX: data.positionX || 0,
         positionY: data.positionY || 0,
         positionZ: data.positionZ || 0,
@@ -141,7 +143,8 @@ class ImageModel {
         publicId: data.publicId,
         author: data.author || '',
         description: data.description || '',
-        // Thêm các trường vị trí và xoay
+        imageType: data.imageType || 'ngang', // Thêm trường imageType với giá trị mặc định là "ngang"
+        // Các trường vị trí và xoay
         positionX: data.positionX || 0,
         positionY: data.positionY || 0,
         positionZ: data.positionZ || 0,
@@ -173,7 +176,8 @@ class ImageModel {
           publicId: imageData.publicId,
           author: imageData.author || '',
           description: imageData.description || '',
-          // Thêm các trường vị trí và xoay
+          imageType: imageData.imageType || 'ngang', // Thêm trường imageType với giá trị mặc định là "ngang"
+          // Các trường vị trí và xoay
           positionX: imageData.positionX || 0,
           positionY: imageData.positionY || 0,
           positionZ: imageData.positionZ || 0,
@@ -197,6 +201,7 @@ class ImageModel {
         publicId: image.publicId,
         author: image.author || '',
         description: image.description || '',
+        imageType: image.imageType || 'ngang', // Thêm trường imageType với giá trị mặc định là "ngang"
         positionX: image.positionX || 0,
         positionY: image.positionY || 0,
         positionZ: image.positionZ || 0,
@@ -228,7 +233,8 @@ class ImageModel {
           publicId: imageData.publicId,
           author: imageData.author || '',
           description: imageData.description || '',
-          // Thêm các trường vị trí và xoay
+          imageType: imageData.imageType || 'ngang', // Thêm trường imageType với giá trị mặc định là "ngang" 
+          // Các trường vị trí và xoay
           positionX: imageData.positionX || 0,
           positionY: imageData.positionY || 0,
           positionZ: imageData.positionZ || 0,
@@ -254,6 +260,7 @@ class ImageModel {
         publicId: image.publicId,
         author: image.author || '',
         description: image.description || '',
+        imageType: image.imageType || 'ngang', // Thêm trường imageType với giá trị mặc định là "ngang"
         positionX: image.positionX || 0,
         positionY: image.positionY || 0,
         positionZ: image.positionZ || 0,
