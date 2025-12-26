@@ -1,24 +1,24 @@
 <div class="container-fluid">
-  <h1 class="mb-4">Quản lý Ảnh</h1>
+  <h1 class="mb-4">Quản lý Model 3D</h1>
   
-  <% if (success && success.length > 0) { %>
+  <% if (messages && messages.success) { %>
     <div class="alert alert-success alert-dismissible fade show">
-      <%= success %>
+      <%= messages.success %>
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   <% } %>
   
-  <% if (error && error.length > 0) { %>
+  <% if (messages && messages.error) { %>
     <div class="alert alert-danger alert-dismissible fade show">
-      <%= error %>
+      <%= messages.error %>
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   <% } %>
   
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <p>Tổng số: <strong><%= images ? images.length : 0 %></strong> ảnh</p>
-    <a href="/admin/images/create" class="btn btn-primary">
-      <i class="bi bi-plus-circle"></i> Thêm ảnh mới
+    <p>Tổng số: <strong><%= models ? models.length : 0 %></strong> model</p>
+    <a href="/admin/model3d/create" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Thêm Model 3D mới
     </a>
   </div>
 
@@ -26,47 +26,59 @@
     <table class="table table-striped table-hover table-sm align-middle">
       <thead class="table-light">
         <tr>
-          <th style="width: 70px;">ID</th>
-          <th style="width: 120px;">Ảnh</th>
+          <th style="width: 100px;">ID</th>
           <th style="width: 120px;">Tên</th>
-          <th style="width: 70px;">Frame</th>
           <th style="width: 80px;">Tác giả</th>
-          <th style="width: 150px;">URL</th>
+          <th style="width: 110px;">URL</th>
           <th style="width: 90px;">Vị trí</th>
           <th style="width: 90px;">Xoay</th>
+          <th style="width: 90px;">Kích thước</th>
           <th style="width: 100px;">Tạo lúc</th>
           <th style="width: 70px;">Thao tác</th>
         </tr>
       </thead>
       <tbody>
-        <% if (images && images.length > 0) { %>
-          <% images.forEach(image => { %>
+        <% if (models && models.length > 0) { %>
+          <% models.forEach(model => { %>
             <tr>
               <td>
                 <div class="expandable-cell" onclick="toggleCell(this)">
                   <div class="cell-content collapsed">
-                    <span class="text-truncate d-inline-block" style="max-width: 65px;"><%= image.id %></span>
+                    <span class="text-truncate d-inline-block" style="max-width: 95px;"><%= model.id %></span>
                   </div>
                   <div class="cell-content expanded">
-                    <span class="text-break"><%= image.id %></span>
+                    <span class="text-break"><%= model.id %></span>
                   </div>
                 </div>
               </td>
               <td>
-                <% if (image.url) { %>
+                <div class="expandable-cell" onclick="toggleCell(this)">
+                  <div class="cell-content collapsed">
+                    <span class="text-truncate d-inline-block" style="max-width: 115px;"><%= model.name %></span>
+                  </div>
+                  <div class="cell-content expanded">
+                    <span class="text-break"><%= model.name %></span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="expandable-cell" onclick="toggleCell(this)">
+                  <div class="cell-content collapsed">
+                    <span class="text-truncate d-inline-block" style="max-width: 75px;"><%= model.author || 'Không có' %></span>
+                  </div>
+                  <div class="cell-content expanded">
+                    <span class="text-break"><%= model.author || 'Không có' %></span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <% if (model.url) { %>
                   <div class="expandable-cell" onclick="toggleCell(this)">
                     <div class="cell-content collapsed">
-                      <img src="<%= image.url %>" alt="<%= image.name %>" class="img-thumbnail" style="max-width: 80px; max-height: 50px;">
+                      <span class="text-truncate d-inline-block" style="max-width: 105px;"><%= model.url %></span>
                     </div>
                     <div class="cell-content expanded">
-                      <div class="p-1">
-                        <img src="<%= image.url %>" alt="<%= image.name %>" class="img-fluid" style="max-width: 250px; max-height: 180px;">
-                        <div class="mt-1">
-                          <a href="<%= image.url %>" target="_blank" class="btn btn-sm btn-outline-info">
-                            <i class="bi bi-eye"></i> Xem ảnh gốc
-                          </a>
-                        </div>
-                      </div>
+                      <span class="text-break"><%= model.url %></span>
                     </div>
                   </div>
                 <% } else { %>
@@ -76,71 +88,17 @@
               <td>
                 <div class="expandable-cell" onclick="toggleCell(this)">
                   <div class="cell-content collapsed">
-                    <span class="text-truncate d-inline-block" style="max-width: 115px;"><%= image.name %></span>
-                  </div>
-                  <div class="cell-content expanded">
-                    <span class="text-break"><%= image.name %></span>
-                    <% if (image.description) { %>
-                      <div class="small text-muted mt-1">
-                        Mô tả: <%= image.description %>
-                      </div>
-                    <% } %>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="expandable-cell" onclick="toggleCell(this)">
-                  <div class="cell-content collapsed">
-                    <span class="badge bg-light text-dark"><%= image.frameUse %></span>
-                  </div>
-                  <div class="cell-content expanded">
-                    <span class="badge bg-light text-dark"><%= image.frameUse %></span>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="expandable-cell" onclick="toggleCell(this)">
-                  <div class="cell-content collapsed">
-                    <span class="text-truncate d-inline-block" style="max-width: 75px;"><%= image.author || 'Không có' %></span>
-                  </div>
-                  <div class="cell-content expanded">
-                    <span class="text-break"><%= image.author || 'Không có' %></span>
-                  </div>
-                </div>
-              </td>
-              <!-- Thêm cột URL -->
-              <td>
-                <div class="expandable-cell" onclick="toggleCell(this)">
-                  <div class="cell-content collapsed">
-                    <% if (image.url) { %>
-                      <span class="text-truncate d-inline-block" style="max-width: 145px;"><%= image.url.split('/').pop() %></span>
-                    <% } else { %>
-                      <span class="badge bg-secondary">Không có</span>
-                    <% } %>
-                  </div>
-                  <div class="cell-content expanded">
-                    <% if (image.url) { %>
-                      <span class="text-break"><%= image.url %></span>
-                    <% } else { %>
-                      <span class="badge bg-secondary">Không có</span>
-                    <% } %>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="expandable-cell" onclick="toggleCell(this)">
-                  <div class="cell-content collapsed">
                     <div class="position-data">
-                      <small>X: <%= parseFloat(image.positionX || 0).toFixed(1) %></small>
-                      <small>Y: <%= parseFloat(image.positionY || 0).toFixed(1) %></small>
-                      <small>Z: <%= parseFloat(image.positionZ || 0).toFixed(1) %></small>
+                      <small>X: <%= parseFloat(model.position_x || 0).toFixed(1) %></small>
+                      <small>Y: <%= parseFloat(model.position_y || 0).toFixed(1) %></small>
+                      <small>Z: <%= parseFloat(model.position_z || 0).toFixed(1) %></small>
                     </div>
                   </div>
                   <div class="cell-content expanded">
                     <div class="position-data-full">
-                      <div>X: <%= image.positionX || '0' %></div>
-                      <div>Y: <%= image.positionY || '0' %></div>
-                      <div>Z: <%= image.positionZ || '0' %></div>
+                      <div>X: <%= model.position_x || '0' %></div>
+                      <div>Y: <%= model.position_y || '0' %></div>
+                      <div>Z: <%= model.position_z || '0' %></div>
                     </div>
                   </div>
                 </div>
@@ -149,16 +107,34 @@
                 <div class="expandable-cell" onclick="toggleCell(this)">
                   <div class="cell-content collapsed">
                     <div class="position-data">
-                      <small>X: <%= parseFloat(image.rotationX || 0).toFixed(0) %>°</small>
-                      <small>Y: <%= parseFloat(image.rotationY || 0).toFixed(0) %>°</small>
-                      <small>Z: <%= parseFloat(image.rotationZ || 0).toFixed(0) %>°</small>
+                      <small>X: <%= parseFloat(model.rotation_x || 0).toFixed(0) %>°</small>
+                      <small>Y: <%= parseFloat(model.rotation_y || 0).toFixed(0) %>°</small>
+                      <small>Z: <%= parseFloat(model.rotation_z || 0).toFixed(0) %>°</small>
                     </div>
                   </div>
                   <div class="cell-content expanded">
                     <div class="position-data-full">
-                      <div>X: <%= image.rotationX || '0' %>°</div>
-                      <div>Y: <%= image.rotationY || '0' %>°</div>
-                      <div>Z: <%= image.rotationZ || '0' %>°</div>
+                      <div>X: <%= model.rotation_x || '0' %>°</div>
+                      <div>Y: <%= model.rotation_y || '0' %>°</div>
+                      <div>Z: <%= model.rotation_z || '0' %>°</div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="expandable-cell" onclick="toggleCell(this)">
+                  <div class="cell-content collapsed">
+                    <div class="position-data">
+                      <small>X: <%= parseFloat(model.scale_x || 1).toFixed(1) %></small>
+                      <small>Y: <%= parseFloat(model.scale_y || 1).toFixed(1) %></small>
+                      <small>Z: <%= parseFloat(model.scale_z || 1).toFixed(1) %></small>
+                    </div>
+                  </div>
+                  <div class="cell-content expanded">
+                    <div class="position-data-full">
+                      <div>X: <%= model.scale_x || '1' %></div>
+                      <div>Y: <%= model.scale_y || '1' %></div>
+                      <div>Z: <%= model.scale_z || '1' %></div>
                     </div>
                   </div>
                 </div>
@@ -167,34 +143,26 @@
                 <div class="expandable-cell" onclick="toggleCell(this)">
                   <div class="cell-content collapsed">
                     <div class="small">
-                      <% if (image.createdAt) { %>
-                        <%= new Date(image.createdAt).toLocaleDateString('vi-VN', {day: '2-digit', month:'2-digit'}) %>
-                        <small class="d-block text-muted">
-                          <%= new Date(image.createdAt).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) %>
-                        </small>
-                      <% } else { %>
-                        Không có
-                      <% } %>
+                      <%= new Date(model.created_at).toLocaleDateString('vi-VN', {day: '2-digit', month:'2-digit'}) %>
+                      <small class="d-block text-muted">
+                        <%= new Date(model.created_at).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) %>
+                      </small>
                     </div>
                   </div>
                   <div class="cell-content expanded">
                     <div class="small">
-                      <% if (image.createdAt) { %>
-                        <%= new Date(image.createdAt).toLocaleString('vi-VN') %>
-                      <% } else { %>
-                        Không có
-                      <% } %>
+                      <%= new Date(model.created_at).toLocaleString('vi-VN') %>
                     </div>
                   </div>
                 </div>
               </td>
               <td>
                 <div class="btn-group btn-group-sm" role="group">
-                  <a href="/admin/images/edit/<%= image.id %>" class="btn btn-sm btn-outline-info" title="Chỉnh sửa">
+                  <a href="/admin/model3d/edit/<%= model.id %>" class="btn btn-sm btn-outline-info" title="Chỉnh sửa">
                     <i class="bi bi-pencil"></i>
                   </a>
                   <button 
-                    onclick="confirmDelete('<%= image.id %>', '<%= image.name %>')" 
+                    onclick="confirmDelete('<%= model.id %>', '<%= model.name %>')" 
                     class="btn btn-sm btn-outline-danger"
                     title="Xóa">
                     <i class="bi bi-trash"></i>
@@ -205,7 +173,7 @@
           <% }) %>
         <% } else { %>
           <tr>
-            <td colspan="10" class="text-center">Không có ảnh nào.</td>
+            <td colspan="9" class="text-center">Không có model 3D nào.</td>
           </tr>
         <% } %>
       </tbody>
@@ -295,15 +263,15 @@ function confirmDelete(id, name) {
   // Ngăn sự kiện click lan ra ngoài
   event.stopPropagation();
   
-  if (confirm(`Bạn có chắc chắn muốn xóa ảnh "${name}"?`)) {
+  if (confirm(`Bạn có chắc chắn muốn xóa model "${name}"?`)) {
     // Hiển thị thông báo loading
     const loadingToast = document.createElement('div');
     loadingToast.className = 'position-fixed top-50 start-50 translate-middle bg-dark text-white p-3 rounded d-flex align-items-center';
     loadingToast.style.zIndex = '1050';
-    loadingToast.innerHTML = '<div class="spinner-border spinner-border-sm me-2" role="status"></div><span>Đang xóa ảnh...</span>';
+    loadingToast.innerHTML = '<div class="spinner-border spinner-border-sm me-2" role="status"></div><span>Đang xóa model...</span>';
     document.body.appendChild(loadingToast);
     
-    fetch(`/admin/images/${id}`, {
+    fetch(`/admin/model3d/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -315,7 +283,7 @@ function confirmDelete(id, name) {
       document.body.removeChild(loadingToast);
       
       if (data.success) {
-        alert('Xóa ảnh thành công!');
+        alert('Xóa model thành công!');
         window.location.reload();
       } else {
         alert(`Lỗi: ${data.message}`);

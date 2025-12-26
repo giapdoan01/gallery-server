@@ -11,6 +11,7 @@ const config = require('./config/config');
 const loggerMiddleware = require('./middleware/logger.middleware');
 const { errorMiddleware, notFoundMiddleware } = require('./middleware/error.middleware');
 const apiRoutes = require('./routes');
+const apiModel3dRoutes = require('./routes/api.model3d.routes');
 const adminRoutes = require('./routes/admin.routes');
 const apiImageRoutes = require('./routes/api.image.routes');
 const ResponseUtil = require('./utils/response.util');
@@ -89,6 +90,8 @@ function createApp() {
     
     // API Image routes
     app.use('/api', apiImageRoutes);
+    // API Model3D routes
+    app.use('/api', apiModel3dRoutes);
 
     // 404 handler
     app.use(notFoundMiddleware);

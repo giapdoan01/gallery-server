@@ -1,9 +1,9 @@
 <div class="container-fluid">
-  <h1 class="mb-3 fs-4">Chỉnh sửa ảnh: <%= image.name %></h1>
+  <h1 class="mb-3 fs-4">Chỉnh sửa Model 3D: <%= model.name %></h1>
   
-  <% if (error && error.length > 0) { %>
+  <% if (messages && messages.error) { %>
     <div class="alert alert-danger alert-dismissible fade show py-2 small">
-      <%= error %>
+      <%= messages.error %>
       <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   <% } %>
@@ -18,49 +18,44 @@
   
   <div class="card shadow-sm">
     <div class="card-body p-3">
-      <form id="editImageForm" action="/admin/images/edit/<%= image.id %>" method="POST" enctype="multipart/form-data">
+      <form id="editModelForm" enctype="multipart/form-data">
         <div class="row g-3">
           <div class="col-md-6">
-            <label for="name" class="form-label small">Tên ảnh <span class="text-danger">*</span></label>
-            <input type="text" class="form-control form-control-sm" id="name" name="name" value="<%= image.name %>" required>
+            <label for="name" class="form-label small">Tên Model 3D <span class="text-danger">*</span></label>
+            <input type="text" class="form-control form-control-sm" id="name" name="name" value="<%= model.name %>" required>
           </div>
-          
-          <div class="col-md-6">
-            <label for="frameUse" class="form-label small">Frame <span class="text-danger">*</span></label>
-            <input type="number" class="form-control form-control-sm" id="frameUse" name="frameUse" value="<%= image.frameUse %>" required>
-          </div>
-        </div>
-        
-        <div class="row mt-3">
+
           <div class="col-md-6">
             <label for="author" class="form-label small">Tác giả</label>
-            <input type="text" class="form-control form-control-sm" id="author" name="author" value="<%= image.author || '' %>">
-          </div>
-          
-          <div class="col-md-6 mb-3">
-            <label for="description" class="form-label small">Mô tả</label>
-            <textarea class="form-control form-control-sm" id="description" name="description" rows="2"><%= image.description || '' %></textarea>
+            <input type="text" class="form-control form-control-sm" id="author" name="author" value="<%= model.author || '' %>">
           </div>
         </div>
 
-        <!-- Hiển thị ảnh hiện tại nếu có -->
+        <div class="mb-3 mt-3">
+          <label for="description" class="form-label small">Mô tả</label>
+          <textarea class="form-control form-control-sm" id="description" name="description" rows="2"><%= model.description || '' %></textarea>
+        </div>
+
+        <!-- Hiển thị model hiện tại nếu có -->
         <div class="mb-3">
-          <label for="image" class="form-label small">Ảnh hiện tại</label>
-          <% if (image.url) { %>
-            <div class="mb-2 border p-2 d-inline-block">
-              <img src="<%= image.url %>" alt="<%= image.name %>" style="max-width: 200px; max-height: 150px;">
+          <label class="form-label small">File Model 3D hiện tại</label>
+          <% if (model.url) { %>
+            <div>
+              <a href="<%= model.url %>" target="_blank" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-eye"></i> Xem model: <%= model.url.split('/').pop() %>
+              </a>
             </div>
           <% } else { %>
-            <div class="alert alert-secondary py-1 small">Chưa có ảnh</div>
+            <div class="alert alert-secondary py-1 small">Chưa có file model</div>
           <% } %>
         </div>
-        
+
         <div class="mb-3">
-          <label for="image" class="form-label small">Tải ảnh mới</label>
-          <input type="file" class="form-control form-control-sm" id="image" name="image" accept="image/*">
-          <small class="form-text text-muted fst-italic">Chỉ tải lên nếu bạn muốn thay đổi ảnh hiện tại</small>
+          <label for="model3dFile" class="form-label small">Tải file Model 3D mới</label>
+          <input type="file" class="form-control form-control-sm" id="model3dFile" name="model3dFile">
+          <small class="form-text text-muted fst-italic">Chỉ tải lên file mới nếu muốn thay thế file hiện tại.</small>
         </div>
-        
+
         <!-- Thanh tiến trình upload -->
         <div class="progress mb-3 d-none" id="uploadProgressContainer" style="height: 0.7rem">
           <div class="progress-bar progress-bar-striped progress-bar-animated" 
@@ -76,7 +71,7 @@
 
         <div class="row">
           <!-- Vị trí (Position) -->
-          <div class="col-md-6 mb-2">
+          <div class="col-md-4 mb-2">
             <div class="card border-light shadow-sm">
               <div class="card-header bg-light py-1 px-2">
                 <h6 class="mb-0 small">Vị trí</h6>
@@ -85,15 +80,15 @@
                 <div class="row g-2">
                   <div class="col-4">
                     <label for="positionX" class="form-label small">X</label>
-                    <input type="number" step="0.01" class="form-control form-control-sm" id="positionX" name="positionX" value="<%= image.positionX || 0 %>">
+                    <input type="number" step="0.1" class="form-control form-control-sm" id="positionX" name="positionX" value="<%= model.position_x || 0 %>">
                   </div>
                   <div class="col-4">
                     <label for="positionY" class="form-label small">Y</label>
-                    <input type="number" step="0.01" class="form-control form-control-sm" id="positionY" name="positionY" value="<%= image.positionY || 0 %>">
+                    <input type="number" step="0.1" class="form-control form-control-sm" id="positionY" name="positionY" value="<%= model.position_y || 0 %>">
                   </div>
                   <div class="col-4">
                     <label for="positionZ" class="form-label small">Z</label>
-                    <input type="number" step="0.01" class="form-control form-control-sm" id="positionZ" name="positionZ" value="<%= image.positionZ || 0 %>">
+                    <input type="number" step="0.1" class="form-control form-control-sm" id="positionZ" name="positionZ" value="<%= model.position_z || 0 %>">
                   </div>
                 </div>
               </div>
@@ -101,7 +96,7 @@
           </div>
 
           <!-- Xoay (Rotation) -->
-          <div class="col-md-6 mb-2">
+          <div class="col-md-4 mb-2">
             <div class="card border-light shadow-sm">
               <div class="card-header bg-light py-1 px-2">
                 <h6 class="mb-0 small">Xoay (độ)</h6>
@@ -110,15 +105,40 @@
                 <div class="row g-2">
                   <div class="col-4">
                     <label for="rotationX" class="form-label small">X</label>
-                    <input type="number" step="0.01" class="form-control form-control-sm" id="rotationX" name="rotationX" value="<%= image.rotationX || 0 %>">
+                    <input type="number" step="1" class="form-control form-control-sm" id="rotationX" name="rotationX" value="<%= model.rotation_x || 0 %>">
                   </div>
                   <div class="col-4">
                     <label for="rotationY" class="form-label small">Y</label>
-                    <input type="number" step="0.01" class="form-control form-control-sm" id="rotationY" name="rotationY" value="<%= image.rotationY || 0 %>">
+                    <input type="number" step="1" class="form-control form-control-sm" id="rotationY" name="rotationY" value="<%= model.rotation_y || 0 %>">
                   </div>
                   <div class="col-4">
                     <label for="rotationZ" class="form-label small">Z</label>
-                    <input type="number" step="0.01" class="form-control form-control-sm" id="rotationZ" name="rotationZ" value="<%= image.rotationZ || 0 %>">
+                    <input type="number" step="1" class="form-control form-control-sm" id="rotationZ" name="rotationZ" value="<%= model.rotation_z || 0 %>">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kích thước (Scale) -->
+          <div class="col-md-4 mb-2">
+            <div class="card border-light shadow-sm">
+              <div class="card-header bg-light py-1 px-2">
+                <h6 class="mb-0 small">Kích thước</h6>
+              </div>
+              <div class="card-body p-2">
+                <div class="row g-2">
+                  <div class="col-4">
+                    <label for="scaleX" class="form-label small">X</label>
+                    <input type="number" step="0.1" class="form-control form-control-sm" id="scaleX" name="scaleX" value="<%= model.scale_x || 1 %>">
+                  </div>
+                  <div class="col-4">
+                    <label for="scaleY" class="form-label small">Y</label>
+                    <input type="number" step="0.1" class="form-control form-control-sm" id="scaleY" name="scaleY" value="<%= model.scale_y || 1 %>">
+                  </div>
+                  <div class="col-4">
+                    <label for="scaleZ" class="form-label small">Z</label>
+                    <input type="number" step="0.1" class="form-control form-control-sm" id="scaleZ" name="scaleZ" value="<%= model.scale_z || 1 %>">
                   </div>
                 </div>
               </div>
@@ -128,9 +148,9 @@
 
         <div class="d-flex gap-2 mt-3">
           <button type="submit" class="btn btn-sm btn-outline-primary" id="submitButton">
-            <i class="bi bi-save"></i> Cập nhật ảnh
+            <i class="bi bi-save"></i> Cập nhật Model 3D
           </button>
-          <a href="/admin/images" class="btn btn-sm btn-outline-secondary">
+          <a href="/admin/model3d" class="btn btn-sm btn-outline-secondary">
             <i class="bi bi-x-circle"></i> Hủy
           </a>
         </div>
@@ -155,7 +175,7 @@
 </style>
 
 <script>
-document.getElementById('editImageForm').addEventListener('submit', function(e) {
+document.getElementById('editModelForm').addEventListener('submit', function(e) {
   e.preventDefault();
   
   // Hiển thị trạng thái loading
@@ -171,10 +191,10 @@ document.getElementById('editImageForm').addEventListener('submit', function(e) 
   
   // Hiển thị thông báo
   statusAlert.classList.remove('d-none');
-  statusMessage.textContent = 'Đang chuẩn bị cập nhật ảnh...';
+  statusMessage.textContent = 'Đang chuẩn bị cập nhật model 3D...';
   
   // Kiểm tra xem có file upload mới không
-  const hasNewFile = document.getElementById('image').files.length > 0;
+  const hasNewFile = document.getElementById('model3dFile').files.length > 0;
   
   if (hasNewFile) {
     // Hiển thị thanh tiến trình nếu có file mới
@@ -193,9 +213,9 @@ document.getElementById('editImageForm').addEventListener('submit', function(e) 
       
       // Cập nhật thông báo trạng thái dựa trên tiến trình
       if (progress < 30) {
-        statusMessage.textContent = 'Đang tải lên ảnh mới...';
+        statusMessage.textContent = 'Đang tải lên file model 3D mới...';
       } else if (progress < 60) {
-        statusMessage.textContent = 'Đang xử lý ảnh...';
+        statusMessage.textContent = 'Đang xử lý file model 3D...';
       } else if (progress < 85) {
         statusMessage.textContent = 'Đang cập nhật thông tin vào hệ thống...';
       } else {
@@ -204,15 +224,17 @@ document.getElementById('editImageForm').addEventListener('submit', function(e) 
     }, 500);
   } else {
     // Nếu không có file mới, chỉ hiển thị thông báo đang cập nhật
-    statusMessage.textContent = 'Đang cập nhật thông tin ảnh...';
+    statusMessage.textContent = 'Đang cập nhật thông tin model 3D...';
   }
   
-  // Gửi form bằng XMLHttpRequest thay vì submit form bình thường
   const formData = new FormData(this);
-  const xhr = new XMLHttpRequest();
   
-  xhr.open('POST', this.action, true);
-  xhr.onload = function() {
+  fetch('/admin/model3d/<%= model.id %>', {
+    method: 'PUT',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
     if (hasNewFile) {
       // Dừng giả lập tiến trình nếu có
       clearInterval(simulateProgress);
@@ -223,26 +245,25 @@ document.getElementById('editImageForm').addEventListener('submit', function(e) 
       progressBar.setAttribute('aria-valuenow', 100);
     }
     
-    if (xhr.status === 200) {
+    if (data.success) {
       statusAlert.classList.remove('alert-info');
       statusAlert.classList.add('alert-success');
-      statusMessage.textContent = 'Ảnh đã được cập nhật thành công! Đang chuyển hướng...';
+      statusMessage.textContent = 'Model 3D đã được cập nhật thành công! Đang chuyển hướng...';
       
       setTimeout(() => {
-        window.location.href = '/admin/images';
+        window.location.href = '/admin/model3d';
       }, 1000);
     } else {
       statusAlert.classList.remove('alert-info');
       statusAlert.classList.add('alert-danger');
-      statusMessage.textContent = `Lỗi: ${xhr.statusText || 'Không thể cập nhật ảnh'}`;
+      statusMessage.textContent = `Lỗi: ${data.message}`;
       
       // Kích hoạt lại nút gửi
       submitButton.disabled = false;
-      submitButton.innerHTML = '<i class="bi bi-save"></i> Cập nhật ảnh';
+      submitButton.innerHTML = '<i class="bi bi-save"></i> Cập nhật Model 3D';
     }
-  };
-  
-  xhr.onerror = function() {
+  })
+  .catch(error => {
     if (hasNewFile) {
       // Dừng giả lập tiến trình nếu có
       clearInterval(simulateProgress);
@@ -250,13 +271,11 @@ document.getElementById('editImageForm').addEventListener('submit', function(e) 
     
     statusAlert.classList.remove('alert-info');
     statusAlert.classList.add('alert-danger');
-    statusMessage.textContent = 'Lỗi kết nối máy chủ';
+    statusMessage.textContent = `Lỗi: ${error.message}`;
     
     // Kích hoạt lại nút gửi
     submitButton.disabled = false;
-    submitButton.innerHTML = '<i class="bi bi-save"></i> Cập nhật ảnh';
-  };
-  
-  xhr.send(formData);
+    submitButton.innerHTML = '<i class="bi bi-save"></i> Cập nhật Model 3D';
+  });
 });
 </script>
