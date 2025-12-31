@@ -18,7 +18,7 @@ class Player extends Schema {
 // Define schema types
 type("string")(Player.prototype, "sessionId");
 type("string")(Player.prototype, "username");
-type("string")(Player.prototype, "avatarURL"); // ✅ THÊM TYPE NÀY
+type("string")(Player.prototype, "avatarURL"); 
 type("number")(Player.prototype, "x");
 type("number")(Player.prototype, "y");
 type("number")(Player.prototype, "z");
