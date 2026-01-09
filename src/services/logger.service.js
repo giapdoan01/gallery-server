@@ -31,6 +31,13 @@ class LoggerService {
     static room(action, roomId, ...args) {
         console.log(`🏠 [ROOM] ${action}: ${roomId}`, ...args);
     }
+    static chat(username, message) {
+        const timestamp = new Date().toLocaleTimeString();
+        console.log(`💬 [CHAT ${timestamp}] ${username}: ${message}`);
+    }
+    static debug(message) {
+        console.log(`🔍 [DEBUG] ${message}`);
+    }
 }
 
 module.exports = LoggerService;

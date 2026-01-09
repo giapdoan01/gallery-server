@@ -41,7 +41,6 @@ class MessageHandler {
         }
     }
 
-
     static handleAnimation(room, client, data) {
         const player = room.state.players.get(client.sessionId);
         
@@ -50,12 +49,14 @@ class MessageHandler {
             return;
         }
         
-        if (player.animationState !== undefined && data.state && typeof data.state === 'string') {
+        // ✅ GIỮ NGUYÊN LOGIC CŨ - Chỉ check data.state
+        if (data.state && typeof data.state === 'string') {
             player.animationState = data.state;
             LoggerService.player('ANIMATION', player.username, data.state);
         }
     }
 
+    // ✅ THÊM MỚI - CHAT HANDLER
     static handleChat(room, client, data) {
         const player = room.state.players.get(client.sessionId);
         
@@ -65,17 +66,18 @@ class MessageHandler {
         }
         
         // Validate message
-        if (!data.text || typeof data.text !== 'string' || data.text.trim().length === 0) {
+        if (!data.message || typeof data.message !== 'string' || data.message.trim().length === 0) {
+            console.warn(`⚠️ Invalid chat message from ${player.username}`);
             return;
         }
         
         // Sanitize message
-        const message = SanitizerUtil.sanitizeText(data.text.trim().substring(0, 200));
+        const message = SanitizerUtil.sanitizeText(data.message.trim().substring(0, 500));
         
         // Broadcast to all clients
         room.broadcast("chatMessage", {
-            sessionId: client.sessionId,        
-            username: player.username,         
+            sessionId: client.sessionId,
+            username: player.username,
             message: message,
             timestamp: Date.now()
         });
@@ -98,8 +100,8 @@ class MessageHandler {
         
         // Broadcast to other players
         room.broadcast("playerEmote", {
-            sessionId: client.sessionId,       
-            username: player.username,        
+            sessionId: client.sessionId,
+            username: player.username,
             emoteType: data.type
         }, { except: client });
         
@@ -129,7 +131,6 @@ class MessageHandler {
             }, { except: client });
         }
     }
-
 
     static handleStopViewing(room, client, data) {
         const player = room.state.players.get(client.sessionId);
