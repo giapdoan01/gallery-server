@@ -18,7 +18,7 @@ class ImageModel {
         query = query.order(field, { ascending: direction === 'ASC' });
       } else {
         // Mặc định sắp xếp theo frameUse tăng dần
-        query = query.order('frameuse', { ascending: true });
+        query = query.order('frameUse', { ascending: true });
       }
       
       // Xử lý where
@@ -41,7 +41,7 @@ class ImageModel {
         id: image.id,
         name: image.name,
         url: image.url,
-        frameuse: image.frameuse,
+        frameUse: image.frameUse,
         publicId: image.publicId,
         author: image.author || '',
         description: image.description || '',
@@ -87,7 +87,7 @@ class ImageModel {
         id: data.id,
         name: data.name,
         url: data.url,
-        frameuse: data.frameuse,
+        frameUse: data.frameUse,
         publicId: data.publicId,
         author: data.author || '',
         description: data.description || '',
@@ -139,7 +139,7 @@ class ImageModel {
         id: data.id,
         name: data.name,
         url: data.url,
-        frameuse: data.frameuse,
+        frameUse: data.frameUse,
         publicId: data.publicId,
         author: data.author || '',
         description: data.description || '',
@@ -172,7 +172,7 @@ class ImageModel {
         .insert({
           name: imageData.name,
           url: imageData.url,
-          frameuse: imageData.frameuse,
+          frameUse: imageData.frameUse,
           publicId: imageData.publicId,
           author: imageData.author || '',
           description: imageData.description || '',
@@ -197,7 +197,7 @@ class ImageModel {
         id: image.id,
         name: image.name,
         url: image.url,
-        frameuse: image.frameuse,
+        frameUse: image.frameUse,
         publicId: image.publicId,
         author: image.author || '',
         description: image.description || '',
@@ -229,7 +229,7 @@ class ImageModel {
         .update({
           name: imageData.name,
           url: imageData.url,
-          frameuse: imageData.frameuse,
+          frameUse: imageData.frameUse,
           publicId: imageData.publicId,
           author: imageData.author || '',
           description: imageData.description || '',
@@ -256,7 +256,7 @@ class ImageModel {
         id: image.id,
         name: image.name,
         url: image.url,
-        frameuse: image.frameuse,
+        frameUse: image.frameUse,
         publicId: image.publicId,
         author: image.author || '',
         description: image.description || '',
