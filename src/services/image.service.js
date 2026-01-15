@@ -10,7 +10,7 @@ class ImageService {
   static async getAllImages() {
     try {
       return await Image.findAll({
-        order: [['frameUse', 'ASC']]
+        order: [['frameuse', 'ASC']]
       });
     } catch (error) {
       LoggerService.error('Failed to get images:', error.message);
@@ -31,15 +31,15 @@ class ImageService {
   }
 
   /**
-   * Lấy ảnh theo frameUse
+   * Lấy ảnh theo frameuse
    */
-  static async getImageByFrame(frameUse) {
+  static async getImageByFrame(frameuse) {
     try {
       return await Image.findOne({
-        where: { frameUse }
+        where: { frameuse }
       });
     } catch (error) {
-      LoggerService.error(`Failed to get image by frame ${frameUse}:`, error.message);
+      LoggerService.error(`Failed to get image by frame ${frameuse}:`, error.message);
       throw error;
     }
   }
@@ -49,13 +49,13 @@ class ImageService {
    */
   static async createImage(imageData, userId) {
     try {
-      // Kiểm tra frameUse có bị trùng không
+      // Kiểm tra frameuse có bị trùng không
       const existingFrame = await Image.findOne({
-        where: { frameUse: imageData.frameUse }
+        where: { frameuse: imageData.frameuse }
       });
 
       if (existingFrame) {
-        throw new Error(`Frame ${imageData.frameUse} đã được sử dụng`);
+        throw new Error(`Frame ${imageData.frameuse} đã được sử dụng`);
       }
 
       const newImage = await Image.create({
@@ -64,7 +64,7 @@ class ImageService {
         lastUpdatedBy: userId
       });
 
-      LoggerService.success(`New image created for frame ${imageData.frameUse}`);
+      LoggerService.success(`New image created for frame ${imageData.frameuse}`);
       return newImage;
     } catch (error) {
       LoggerService.error('Failed to create image:', error.message);
@@ -83,14 +83,14 @@ class ImageService {
         throw new Error(`Không tìm thấy ảnh với ID ${id}`);
       }
 
-      // Kiểm tra frameUse có bị trùng không nếu frameUse thay đổi
-      if (imageData.frameUse !== image.frameUse) {
+      // Kiểm tra frameuse có bị trùng không nếu frameuse thay đổi
+      if (imageData.frameuse !== image.frameuse) {
         const existingFrame = await Image.findOne({
-          where: { frameUse: imageData.frameUse }
+          where: { frameuse: imageData.frameuse }
         });
 
         if (existingFrame && existingFrame.id !== id) {
-          throw new Error(`Frame ${imageData.frameUse} đã được sử dụng`);
+          throw new Error(`Frame ${imageData.frameuse} đã được sử dụng`);
         }
       }
 
@@ -231,13 +231,13 @@ class ImageService {
   static async debugImageRecords() {
     try {
       const images = await Image.findAll({
-        attributes: ['id', 'name', 'url', 'publicId', 'frameUse']
+        attributes: ['id', 'name', 'url', 'publicId', 'frameuse']
       });
       
       LoggerService.info(`Found ${images.length} images in database`);
       
       for (const img of images) {
-        LoggerService.debug(`Image [${img.id}]: name=${img.name}, frame=${img.frameUse}, publicId=${img.publicId}`);
+        LoggerService.debug(`Image [${img.id}]: name=${img.name}, frame=${img.frameuse}, publicId=${img.publicId}`);
       }
       
       return images;

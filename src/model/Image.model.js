@@ -18,7 +18,7 @@ class ImageModel {
         query = query.order(field, { ascending: direction === 'ASC' });
       } else {
         // Mặc định sắp xếp theo frameUse tăng dần
-        query = query.order('frameUse', { ascending: true });
+        query = query.order('frameuse', { ascending: true });
       }
       
       // Xử lý where
