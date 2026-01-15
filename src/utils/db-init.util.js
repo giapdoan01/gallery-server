@@ -25,7 +25,7 @@ async function createDefaultAdmin() {
       username: 'admin',
       password: 'admin123',
       role: 'admin',
-      isActive: true
+      is_active: true
     };
     
     const admin = await UserModel.create(adminData);

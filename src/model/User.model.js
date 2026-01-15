@@ -20,7 +20,7 @@ class UserModel {
         username: userData.username,
         password: hashedPassword,
         role: userData.role || 'admin',
-        isActive: userData.isActive !== undefined ? userData.isActive : true,
+        is_active: userData.isActive !== undefined ? userData.isActive : true,
         created_at: new Date(),
         updated_at: new Date()
       })
