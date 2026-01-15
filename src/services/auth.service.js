@@ -15,7 +15,7 @@ class AuthService {
       // Tìm user trong database
       const user = await UserModel.findByUsername(username);
       
-      if (!user || !user.isActive) {
+      if (!user || !user.is_active) {
         throw new Error('Tài khoản không tồn tại hoặc đã bị vô hiệu hóa');
       }
       
@@ -53,7 +53,7 @@ class AuthService {
       const decoded = jwt.verify(token, JWT_SECRET);
       const user = await UserModel.findById(decoded.id);
       
-      if (!user || !user.isActive) {
+      if (!user || !user.is_active) {
         throw new Error('Người dùng không tồn tại hoặc đã bị vô hiệu hóa');
       }
       
