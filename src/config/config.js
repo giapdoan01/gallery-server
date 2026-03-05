@@ -32,8 +32,8 @@ module.exports = {
     
     // Spawn positions
     spawnPositions: [
-        { x: -2, y: 0, z: 5 },
-        { x: 0, y: 0, z: 5 },
-        { x: 2, y: 0, z: 5 },
+        { x: 0, y: 0, z: 0 },
+        { x: 0, y: 0, z: 0 },
+        { x: 0, y: 0, z: 0 },
     ]
 };
