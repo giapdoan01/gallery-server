@@ -51,9 +51,9 @@ class GalleryRoom extends Room {
         player.sessionId = client.sessionId;
         player.username = username;
         player.avatarURL = avatarURL; // ✅ LƯU AVATAR URL
-        player.x = Math.random() * 10 - 5;
+        player.x = 0;
         player.y = 0;
-        player.z = Math.random() * 10 - 5;
+        player.z = 0;
         player.rotationY = 0;
         player.animationState = "idle";
         player.isMoving = false;
