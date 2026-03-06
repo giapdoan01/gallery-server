@@ -5,23 +5,21 @@ const LoggerService = require('../../services/logger.service');
 const SanitizerUtil = require('../../utils/sanitizer.util');
 const config = require('../../config/config');
 
+// ✅ Số lượng prefab avatar có trong Unity (index 0 → AVATAR_COUNT - 1)
+const AVATAR_COUNT = 5;
+
 class GalleryRoom extends Room {
-    
+
     onCreate(options) {
-        // Initialize state
         this.setState(new GalleryState());
-        
-        // Room settings
         this.maxClients = config.maxPlayers;
-        
+
         LoggerService.room('CREATED', this.roomId);
-        
-        // Update server time every second
+
         this.setSimulationInterval(() => {
             this.state.serverTime = Date.now();
         }, 1000);
-        
-        // Setup message handlers
+
         this.setupMessageHandlers();
     }
 
@@ -29,50 +27,50 @@ class GalleryRoom extends Room {
         this.onMessage("move", (client, data) => {
             MessageHandler.handleMove(this, client, data);
         });
-        
+
         this.onMessage("animation", (client, data) => {
             MessageHandler.handleAnimation(this, client, data);
         });
-        
+
         this.onMessage("chat", (client, data) => {
             MessageHandler.handleChat(this, client, data);
         });
     }
 
     onJoin(client, options) {
-        // Sanitize input
         const username = SanitizerUtil.sanitizeUsername(options.username || "Guest");
-        const avatarURL = SanitizerUtil.sanitizeUrl(options.avatarURL || "https://models.readyplayer.me/64bfa15f0e72c63d7c3934a6.glb"); // ✅ LẤY AVATAR URL
-        
+
+        // ✅ Nhận avatarIndex từ client, validate trong khoảng [0, AVATAR_COUNT - 1]
+        let avatarIndex = parseInt(options.avatarIndex ?? 0);
+        if (isNaN(avatarIndex) || avatarIndex < 0 || avatarIndex >= AVATAR_COUNT) {
+            avatarIndex = 0;
+        }
+
         LoggerService.player('JOINED', client.sessionId, username);
-        
-        // Create player
+
         const player = new Player();
-        player.sessionId = client.sessionId;
-        player.username = username;
-        player.avatarURL = avatarURL; // ✅ LƯU AVATAR URL
-        player.x = 0;
-        player.y = 0;
-        player.z = 0;
-        player.rotationY = 0;
+        player.sessionId  = client.sessionId;
+        player.username   = username;
+        player.avatarIndex = avatarIndex; // ✅ Lưu index prefab
+        player.x          = 0;
+        player.y          = 0;
+        player.z          = 0;
+        player.rotationY  = 0;
         player.animationState = "idle";
-        player.isMoving = false;
-        
-        // Add to state
+        player.isMoving   = false;
+
         this.state.players.set(client.sessionId, player);
-        
-        // Log player data
-        console.log(`✅ Player data:`, {
-            sessionId: client.sessionId,
-            username: player.username,
-            avatarURL: player.avatarURL,
-            position: { x: player.x, y: player.y, z: player.z }
+
+        console.log(`✅ Player joined:`, {
+            sessionId:   client.sessionId,
+            username:    player.username,
+            avatarIndex: player.avatarIndex,
+            position:    { x: player.x, y: player.y, z: player.z }
         });
     }
 
     onLeave(client, consented) {
         const player = this.state.players.get(client.sessionId);
-        
         if (player) {
             LoggerService.player('LEFT', client.sessionId, player.username);
             this.state.players.delete(client.sessionId);

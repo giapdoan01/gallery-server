@@ -22,19 +22,19 @@ class Player extends Schema {
         super();
         this.sessionId = "";
         this.username = "";
-        this.avatarURL = ""; 
+        this.avatarIndex = 0;   
+        this.x = 0;
         this.y = 0;
         this.z = 0;
         this.rotationY = 0;
-        this.animationState = "";
+        this.animationState = "idle";
         this.isMoving = false;
     }
 }
 
-// Define schema types
 type("string")(Player.prototype, "sessionId");
 type("string")(Player.prototype, "username");
-type("string")(Player.prototype, "avatarURL"); 
+type("number")(Player.prototype, "avatarIndex");  
 type("number")(Player.prototype, "x");
 type("number")(Player.prototype, "y");
 type("number")(Player.prototype, "z");
