@@ -1,7 +1,7 @@
 {
   "name": "gallery-multiplayer-server",
   "version": "1.0.0",
-  "description": "Gallery multiplayer server with MVC architecture",
+  "description": "Gallery multiplayer server using Colyseus",
   "main": "server.js",
   "type": "commonjs",
   "engines": {
@@ -10,43 +10,20 @@
   },
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "test": "echo \"No tests yet\" && exit 0",
-    "cleanup-images": "node src/scripts/cleanup-duplicate-images.js"
+    "dev": "nodemon src/server.js"
   },
-  "keywords": [
-    "game",
-    "multiplayer",
-    "colyseus",
-    "websocket"
-  ],
+  "keywords": ["game", "multiplayer", "colyseus", "websocket"],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@colyseus/monitor": "^0.16.7",
     "@colyseus/schema": "^3.0.70",
-    "@supabase/supabase-js": "^2.89.0",
-    "bcryptjs": "^3.0.3",
-    "chalk": "^5.6.2",
-    "cloudinary": "^1.41.3",
     "colyseus": "^0.16.5",
-    "connect-flash": "^0.1.1",
-    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "ejs": "^3.1.10",
     "express": "^5.2.1",
-    "express-ejs-layouts": "^2.5.1",
-    "express-session": "^1.18.2",
     "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.3",
-    "morgan": "^1.10.1",
-    "multer": "^2.0.2",
-    "multer-storage-cloudinary": "^4.0.0",
-    "pg": "^8.16.3",
-    "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.7",
-    "sqlite3": "^5.1.7"
+    "morgan": "^1.10.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

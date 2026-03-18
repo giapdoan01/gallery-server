@@ -1,45 +1,16 @@
-// server.js
+require('dotenv').config();
 const { createServer } = require('http');
 const { Server } = require('colyseus');
 const { monitor } = require('@colyseus/monitor');
-const path = require('path');
 const createApp = require('./app');
 const config = require('./config/config');
 const GalleryRoom = require('./colyseus/rooms/GalleryRoom');
-const AdminGalleryRoom = require('./colyseus/rooms/AdminGalleryRoom'); // Thêm import AdminGalleryRoom
+const AdminGalleryRoom = require('./colyseus/rooms/AdminGalleryRoom');
 const LoggerService = require('./services/logger.service');
 const RoomService = require('./services/room.service');
-const { sequelize, testConnection } = require('./config/database'); 
-const { initDatabase } = require('./utils/db-init.util');
-const { checkSupabaseConnection } = require('./utils/check-connection');
 
-require('dotenv').config();
-/**
- * Start Server
- */
 async function startServer() {
-    // Kiểm tra kết nối đến Supabase
-    const isConnected = await checkSupabaseConnection();
-    
-    if (!isConnected) {
-        console.error('❌ Không thể kết nối đến Supabase, vui lòng kiểm tra cấu hình kết nối');
-        // Tùy chọn: process.exit(1); nếu muốn dừng server khi không kết nối được
-    } else {
-        // Khởi tạo dữ liệu cơ bản
-        await initDatabase();
-        
-        // Khởi động server
-        const PORT = process.env.PORT || 3000;
-        app.listen(PORT, () => {
-        console.log(`Server đang chạy trên port ${PORT}`);
-        });
-    }
     try {
-        // 0. Initialize database
-        LoggerService.info('Initializing database...');
-        await initDatabase();
-        LoggerService.success('Database initialized successfully');
-
         // 1. Create Express app
         const app = createApp();
 
@@ -61,7 +32,6 @@ async function startServer() {
         gameServer.define(config.roomName, GalleryRoom);
         LoggerService.success(`Room "${config.roomName}" registered`);
 
-        // Thêm đăng ký room admin
         gameServer.define(config.adminRoomName, AdminGalleryRoom);
         LoggerService.success(`Admin Room "${config.adminRoomName}" registered`);
 
@@ -69,14 +39,13 @@ async function startServer() {
         app.use('/monitor', monitor());
         LoggerService.success('Monitor enabled at /monitor');
 
-        // 7. Health check endpoint (QUAN TRỌNG cho Render)
+        // 7. Health check endpoint
         app.get('/health', (req, res) => {
             res.json({
                 status: 'ok',
                 uptime: process.uptime(),
                 timestamp: Date.now(),
                 environment: config.env,
-                totalRooms: gameServer.rooms.size,
                 port: config.port
             });
         });
@@ -84,28 +53,25 @@ async function startServer() {
         // 8. Root endpoint
         app.get('/', (req, res) => {
             res.json({
-                message: '🎨 Gallery Multiplayer Server',
+                message: 'Gallery Multiplayer Server',
                 version: '1.0.0',
                 status: 'running',
                 endpoints: {
                     health: '/health',
                     api: '/api',
                     monitor: '/monitor',
-                    admin: '/admin',
-                    websocket: req.protocol === 'https' 
-                        ? 'wss://' + req.get('host') 
+                    websocket: req.protocol === 'https'
+                        ? 'wss://' + req.get('host')
                         : 'ws://' + req.get('host')
                 }
             });
         });
 
-        // ✅ 9. QUAN TRỌNG: Listen trên port
+        // 9. Listen
         const port = config.port;
         const host = '0.0.0.0';
-        
+
         httpServer.listen(port, host, () => {
-            const isProduction = config.env === 'production';
-            
             console.log(`
 ╔═══════════════════════════════════════════════════════╗
 ║                                                       ║
@@ -113,82 +79,56 @@ async function startServer() {
 ║                                                       ║
 ║   Environment: ${config.env.padEnd(36)}║
 ║   Port: ${port.toString().padEnd(42)}║
-║   Host: ${host.padEnd(42)}║
-║                                                       ║`);
-
-            if (isProduction) {
-                console.log(`║   🌐 Production Mode                                  ║`);
-            } else {
-                console.log(`║   🌐 API: http://localhost:${port}/api${' '.repeat(24)}║
-║   📊 Monitor: http://localhost:${port}/monitor${' '.repeat(18)}║
-║   👑 Admin: http://localhost:${port}/admin${' '.repeat(21)}║
-║   🎮 WebSocket: ws://localhost:${port}${' '.repeat(22)}║`);
-            }
-
-            console.log(`║                                                       ║
-║   📡 Room: "${config.roomName}" (max ${config.maxPlayers} players)${' '.repeat(14)}║
-║   👑 Admin Room: "${config.adminRoomName}" (max 3 admins)${' '.repeat(10)}║
+║   WebSocket: ws://localhost:${port}${' '.repeat(22)}║
+║   Monitor:   http://localhost:${port}/monitor${' '.repeat(18)}║
+║   API:       http://localhost:${port}/api${' '.repeat(21)}║
+║                                                       ║
+║   Room: "${config.roomName}" (max ${config.maxPlayers} players)${' '.repeat(20)}║
+║   Admin Room: "${config.adminRoomName}" (max 3 admins)${' '.repeat(13)}║
 ║                                                       ║
 ╚═══════════════════════════════════════════════════════╝
             `);
-
-            LoggerService.success(`✅ Server is listening on ${host}:${port}`);
-            LoggerService.success('✅ Server is ready!');
+            LoggerService.success(`Server is listening on ${host}:${port}`);
         });
 
-        // 10. Error handling for server
+        // 10. Error handling
         httpServer.on('error', (error) => {
             if (error.code === 'EADDRINUSE') {
-                LoggerService.error(`❌ Port ${port} is already in use`);
+                LoggerService.error(`Port ${port} is already in use`);
             } else {
-                LoggerService.error('❌ Server error:', error.message);
+                LoggerService.error('Server error:', error.message);
             }
             process.exit(1);
         });
 
         // 11. Graceful shutdown
-        process.on('SIGTERM', async () => {
-            LoggerService.warning('⚠️  SIGTERM received, shutting down gracefully...');
+        const shutdown = async () => {
+            LoggerService.warning('Shutting down gracefully...');
             await gameServer.gracefullyShutdown();
-            // Close database connection
-            await sequelize.close();
-            LoggerService.info('Database connection closed');
-            
             httpServer.close(() => {
-                LoggerService.success('✅ Server closed');
+                LoggerService.success('Server closed');
                 process.exit(0);
             });
-        });
+        };
 
-        process.on('SIGINT', async () => {
-            LoggerService.warning('⚠️  SIGINT received, shutting down gracefully...');
-            await gameServer.gracefullyShutdown();
-            // Close database connection
-            await sequelize.close();
-            LoggerService.info('Database connection closed');
-            
-            httpServer.close(() => {
-                LoggerService.success('✅ Server closed');
-                process.exit(0);
-            });
-        });
+        process.on('SIGTERM', shutdown);
+        process.on('SIGINT', shutdown);
 
         // 12. Unhandled errors
-        process.on('unhandledRejection', (reason, promise) => {
-            LoggerService.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+        process.on('unhandledRejection', (reason) => {
+            LoggerService.error('Unhandled Rejection:', reason);
         });
 
         process.on('uncaughtException', (error) => {
-            LoggerService.error('❌ Uncaught Exception:', error);
+            LoggerService.error('Uncaught Exception:', error);
             process.exit(1);
         });
 
     } catch (error) {
-        LoggerService.error('❌ Failed to start server:', error.message);
+        LoggerService.error('Failed to start server:', error.message);
         console.error(error);
         process.exit(1);
     }
 }
 
-// Start server
 startServer();
