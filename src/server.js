@@ -37,7 +37,6 @@ async function startServer() {
 
         // 6. Colyseus monitor
         app.use('/monitor', monitor());
-        LoggerService.success('Monitor enabled at /monitor');
 
         // 7. Health check endpoint
         app.get('/health', (req, res) => {
@@ -72,22 +71,6 @@ async function startServer() {
         const host = '0.0.0.0';
 
         httpServer.listen(port, host, () => {
-            console.log(`
-╔═══════════════════════════════════════════════════════╗
-║                                                       ║
-║   🎨 GALLERY MULTIPLAYER SERVER                      ║
-║                                                       ║
-║   Environment: ${config.env.padEnd(36)}║
-║   Port: ${port.toString().padEnd(42)}║
-║   WebSocket: ws://localhost:${port}${' '.repeat(22)}║
-║   Monitor:   http://localhost:${port}/monitor${' '.repeat(18)}║
-║   API:       http://localhost:${port}/api${' '.repeat(21)}║
-║                                                       ║
-║   Room: "${config.roomName}" (max ${config.maxPlayers} players)${' '.repeat(20)}║
-║   Admin Room: "${config.adminRoomName}" (max 3 admins)${' '.repeat(13)}║
-║                                                       ║
-╚═══════════════════════════════════════════════════════╝
-            `);
             LoggerService.success(`Server is listening on ${host}:${port}`);
         });
 
