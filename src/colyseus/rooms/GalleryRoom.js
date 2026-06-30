@@ -1,4 +1,4 @@
-const { Room } = require('colyseus');
+const { Room, ServerError } = require('colyseus');
 const { GalleryState, Player } = require('../schema/GalleryState');
 const MessageHandler = require('../handlers/message.handler');
 const LoggerService = require('../../services/logger.service');
@@ -12,7 +12,9 @@ class GalleryRoom extends Room {
 
     onCreate(options) {
         this.setState(new GalleryState());
-        this.maxClients = config.maxPlayers;
+        // ✅ Giới hạn thực tế = config.maxPlayers, set maxClients cao hơn 1
+        // để onAuth được gọi và trả về lỗi custom cho client
+        this.maxClients = config.maxPlayers + 1;
 
         LoggerService.room('CREATED', this.roomId);
 
@@ -21,6 +23,18 @@ class GalleryRoom extends Room {
         }, 1000);
 
         this.setupMessageHandlers();
+    }
+
+    /**
+     * ✅ Kiểm tra slot trước khi cho join — nếu đầy thì trả lỗi custom cho client
+     * Client sẽ nhận được ServerError với code 4000 và message "ROOM_FULL"
+     * để xử lý backup logic (chuyển sang room khác, hiển thị thông báo, v.v.)
+     */
+    onAuth(client, options, request) {
+        if (this.clients.length >= config.maxPlayers) {
+            throw new ServerError(4000, 'ROOM_FULL');
+        }
+        return true;
     }
 
     setupMessageHandlers() {

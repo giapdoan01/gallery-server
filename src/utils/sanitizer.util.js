@@ -25,9 +25,11 @@ class SanitizerUtil {
             return `Guest_${Math.floor(Math.random() * 9999)}`;
         }
         
-        // Remove special characters, keep alphanumeric, underscore, space
+        // Remove HTML/control chars but keep Unicode letters (Vietnamese, etc.)
         const sanitized = username.trim()
-            .replace(/[^a-zA-Z0-9_\s]/g, '')
+            .replace(/<[^>]*>/g, '')          // strip HTML tags
+            .replace(/[\x00-\x1F\x7F]/g, '') // strip control characters
+            .replace(/[^\p{L}\p{N}_\s]/gu, '') // keep Unicode letters, digits, underscore, space
             .substring(0, 20);
         
         // If after sanitization it's empty, return guest name
